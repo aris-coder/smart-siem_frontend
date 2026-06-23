@@ -22,7 +22,7 @@ Bienvenue dans le **Frontend** du projet Smart SIEM. Ce service est la vitrine d
 
 ---
 
-## 🚀 Installation & Lancement
+## Installation & Lancement
 
 
 ### 2. Cloner et configurer
