@@ -10,12 +10,18 @@ import { Slider as ShadcnSlider } from '#/components/ui/slider'
 import { Switch as ShadcnSwitch } from '#/components/ui/switch'
 import { Label } from '#/components/ui/label'
 
-export function SubscribeButton({ label }: { label: string }) {
+export function SubscribeButton({
+  label,
+  className,
+}: {
+  label: string
+  className?: string
+}) {
   const form = useFormContext()
   return (
     <form.Subscribe selector={(state) => state.isSubmitting}>
       {(isSubmitting) => (
-        <Button type="submit" disabled={isSubmitting}>
+        <Button type="submit" disabled={isSubmitting} className={className}>
           {label}
         </Button>
       )}
@@ -45,9 +51,11 @@ function ErrorMessages({
 export function TextField({
   label,
   placeholder,
+  type = 'text',
 }: {
   label: string
   placeholder?: string
+  type?: string
 }) {
   const field = useFieldContext<string>()
   const errors = useStore(field.store, (state) => state.meta.errors)
@@ -61,6 +69,7 @@ export function TextField({
         {label}
       </Label>
       <Input
+        type={type}
         value={field.state.value}
         placeholder={placeholder}
         onBlur={field.handleBlur}

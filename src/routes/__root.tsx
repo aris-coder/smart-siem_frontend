@@ -1,12 +1,15 @@
+import { useState } from 'react'
 import {
   HeadContent,
+  Outlet,
   Scripts,
   createRootRouteWithContext,
+  useLocation,
 } from '@tanstack/react-router'
 import { TanStackRouterDevtoolsPanel } from '@tanstack/react-router-devtools'
 import { TanStackDevtools } from '@tanstack/react-devtools'
-import Footer from '../components/Footer'
-import Header from '../components/Header'
+import { TooltipProvider } from '#/components/ui/tooltip'
+import AppSidebar from '../components/sidebar/AppSidebar'
 
 import TanStackQueryDevtools from '../integrations/tanstack-query/devtools'
 
@@ -31,7 +34,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
         content: 'width=device-width, initial-scale=1',
       },
       {
-        title: 'TanStack Start Starter',
+        title: 'Smart SIEM',
       },
     ],
     links: [
@@ -41,6 +44,7 @@ export const Route = createRootRouteWithContext<MyRouterContext>()({
       },
     ],
   }),
+  component: RootLayout,
   shellComponent: RootDocument,
 })
 
@@ -51,10 +55,8 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <script dangerouslySetInnerHTML={{ __html: THEME_INIT_SCRIPT }} />
         <HeadContent />
       </head>
-      <body className="font-sans antialiased [overflow-wrap:anywhere] selection:bg-[rgba(79,184,178,0.24)]">
-        <Header />
+      <body className="font-sans wrap-anywhere min-h-screen min-w-screen">
         {children}
-        <Footer />
         <TanStackDevtools
           config={{
             position: 'bottom-right',
@@ -70,5 +72,38 @@ function RootDocument({ children }: { children: React.ReactNode }) {
         <Scripts />
       </body>
     </html>
+  )
+}
+
+function RootLayout() {
+  const location = useLocation()
+  const isAuthPage = location.pathname === '/auth/login'
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(false)
+
+  const sidebarWidth = sidebarCollapsed ? 64 : 240 // 16 = 64px, 60 = 240px
+
+  return (
+    <TooltipProvider>
+      <div className="flex min-h-screen">
+        {!isAuthPage && (
+          <AppSidebar
+            collapsed={sidebarCollapsed}
+            onToggle={() => setSidebarCollapsed((p) => !p)}
+          />
+        )}
+        <main
+          className="flex-1 transition-all duration-200 ease-in-out"
+          style={!isAuthPage ? { marginLeft: sidebarWidth } : undefined}
+        >
+          {isAuthPage ? (
+            <div className="dark">
+              <Outlet />
+            </div>
+          ) : (
+            <Outlet />
+          )}
+        </main>
+      </div>
+    </TooltipProvider>
   )
 }

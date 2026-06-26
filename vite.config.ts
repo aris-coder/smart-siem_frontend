@@ -8,7 +8,14 @@ import babel from '@rolldown/plugin-babel'
 import tailwindcss from '@tailwindcss/vite'
 
 const config = defineConfig({
+  server: { port: 5173 },
   resolve: { tsconfigPaths: true },
+  optimizeDeps: {
+    include: [
+      '@tanstack/react-store',
+      'use-sync-external-store/shim/with-selector',
+    ],
+  },
   plugins: [
     devtools(),
     tailwindcss(),
