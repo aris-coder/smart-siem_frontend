@@ -16,6 +16,7 @@ import {
   ChevronRight,
   AlertCircle,
   Inbox,
+  CornerDownRight,
 } from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import type { LogEntry } from '#/types'
@@ -39,6 +40,7 @@ interface LogTableProps {
       ) => void)
   onPageChange: (page: number) => void
   onSelectLog: (log: LogEntry | null) => void
+  onPivotIp?: (ip: string) => void
 }
 
 function formatTimestamp(iso: string): string {
@@ -71,6 +73,7 @@ export function LogTable({
   onSortingChange,
   onPageChange,
   onSelectLog,
+  onPivotIp,
 }: LogTableProps) {
   const totalPages = Math.max(1, Math.ceil(total / pageSize))
 
@@ -165,11 +168,27 @@ export function LogTable({
             }
           />
         ),
-        cell: ({ getValue }) => (
-          <span className="whitespace-nowrap font-mono text-xs">
-            {getValue()}
-          </span>
-        ),
+        cell: ({ getValue }) => {
+          const ip = getValue()
+          return (
+            <div className="flex items-center gap-1.5 group/ip min-w-[100px]">
+              <span className="font-mono text-xs">{ip}</span>
+              {onPivotIp && (
+                <button
+                  type="button"
+                  onClick={(e) => {
+                    e.stopPropagation()
+                    onPivotIp(ip)
+                  }}
+                  className="opacity-0 group-hover/ip:opacity-100 transition-opacity p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground cursor-pointer"
+                  title={`Pivoter sur l'IP ${ip}`}
+                >
+                  <CornerDownRight className="size-3" />
+                </button>
+              )}
+            </div>
+          )
+        },
       }),
       columnHelper.accessor((row) => row.source.user_principal, {
         id: 'user_principal',

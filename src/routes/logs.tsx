@@ -61,6 +61,14 @@ function LogsPage() {
     setSelectedLog(null)
   }, [])
 
+  const handlePivotIp = useCallback((ip: string) => {
+    setFilters({ source_ip: ip })
+    setSearchQuery('')
+    setPage(0)
+    setSelectedLog(null)
+    setDetailsOpen(false)
+  }, [])
+
   return (
     <div className="flex h-[calc(100vh-0px)] flex-col gap-4 overflow-auto p-4 lg:p-6">
       {/* Page header */}
@@ -84,7 +92,11 @@ function LogsPage() {
       <LogSearch value={searchQuery} onSearch={handleSearch} />
 
       {/* Filters */}
-      <LogFilters onFilterChange={handleFilterChange} />
+      <LogFilters
+        key={JSON.stringify(filters)}
+        onFilterChange={handleFilterChange}
+        initialValues={filters}
+      />
 
       {/* Table */}
       <LogTable
@@ -100,6 +112,7 @@ function LogsPage() {
         onSortingChange={setSorting}
         onPageChange={handlePageChange}
         onSelectLog={handleSelectLog}
+        onPivotIp={handlePivotIp}
       />
 
       {/* Details sheet */}
@@ -111,7 +124,11 @@ function LogsPage() {
           <SheetHeader>
             <SheetTitle className="sr-only">Log Details</SheetTitle>
           </SheetHeader>
-          <LogDetails log={selectedLog} onClose={handleCloseDetails} />
+          <LogDetails
+            log={selectedLog}
+            onClose={handleCloseDetails}
+            onPivotIp={handlePivotIp}
+          />
         </SheetContent>
       </Sheet>
     </div>

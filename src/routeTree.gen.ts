@@ -9,6 +9,7 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as RulesRouteImport } from './routes/rules'
 import { Route as LogsRouteImport } from './routes/logs'
 import { Route as IncidentsRouteImport } from './routes/incidents'
@@ -16,6 +17,11 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AuthLoginRouteImport } from './routes/auth/login'
 import { Route as AdminUsersRouteImport } from './routes/admin/users'
 
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const RulesRoute = RulesRouteImport.update({
   id: '/rules',
   path: '/rules',
@@ -52,6 +58,7 @@ export interface FileRoutesByFullPath {
   '/incidents': typeof IncidentsRoute
   '/logs': typeof LogsRoute
   '/rules': typeof RulesRoute
+  '/settings': typeof SettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
 }
@@ -60,6 +67,7 @@ export interface FileRoutesByTo {
   '/incidents': typeof IncidentsRoute
   '/logs': typeof LogsRoute
   '/rules': typeof RulesRoute
+  '/settings': typeof SettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
 }
@@ -69,6 +77,7 @@ export interface FileRoutesById {
   '/incidents': typeof IncidentsRoute
   '/logs': typeof LogsRoute
   '/rules': typeof RulesRoute
+  '/settings': typeof SettingsRoute
   '/admin/users': typeof AdminUsersRoute
   '/auth/login': typeof AuthLoginRoute
 }
@@ -79,16 +88,25 @@ export interface FileRouteTypes {
     | '/incidents'
     | '/logs'
     | '/rules'
+    | '/settings'
     | '/admin/users'
     | '/auth/login'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/incidents' | '/logs' | '/rules' | '/admin/users' | '/auth/login'
+  to:
+    | '/'
+    | '/incidents'
+    | '/logs'
+    | '/rules'
+    | '/settings'
+    | '/admin/users'
+    | '/auth/login'
   id:
     | '__root__'
     | '/'
     | '/incidents'
     | '/logs'
     | '/rules'
+    | '/settings'
     | '/admin/users'
     | '/auth/login'
   fileRoutesById: FileRoutesById
@@ -98,12 +116,20 @@ export interface RootRouteChildren {
   IncidentsRoute: typeof IncidentsRoute
   LogsRoute: typeof LogsRoute
   RulesRoute: typeof RulesRoute
+  SettingsRoute: typeof SettingsRoute
   AdminUsersRoute: typeof AdminUsersRoute
   AuthLoginRoute: typeof AuthLoginRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/rules': {
       id: '/rules'
       path: '/rules'
@@ -154,6 +180,7 @@ const rootRouteChildren: RootRouteChildren = {
   IncidentsRoute: IncidentsRoute,
   LogsRoute: LogsRoute,
   RulesRoute: RulesRoute,
+  SettingsRoute: SettingsRoute,
   AdminUsersRoute: AdminUsersRoute,
   AuthLoginRoute: AuthLoginRoute,
 }

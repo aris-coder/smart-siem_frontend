@@ -7,6 +7,7 @@ import {
   Shield,
   Users,
   LayoutDashboard,
+  Settings,
 } from 'lucide-react'
 import {
   Tooltip,
@@ -53,6 +54,12 @@ const navItems: NavItem[] = [
     to: '/admin/users',
     icon: <Users className="size-5 shrink-0" />,
     roles: ['ADMIN'],
+  },
+  {
+    label: 'Settings',
+    to: '/settings',
+    icon: <Settings className="size-5 shrink-0" />,
+    roles: ['READER', 'ANALYST', 'ADMIN'],
   },
 ]
 

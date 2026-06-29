@@ -1,5 +1,4 @@
-import { useCallback } from 'react'
-import { Copy, Download, Bell } from 'lucide-react'
+import { Copy, Download, Bell, CornerDownRight } from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import { Badge } from '#/components/ui/badge'
 import { SeverityBadge } from '#/components/logs/SeverityBadge'
@@ -8,6 +7,7 @@ import type { LogEntry } from '#/types'
 interface LogDetailsProps {
   log: LogEntry | null
   onClose?: () => void
+  onPivotIp?: (ip: string) => void
 }
 
 function copyToClipboard(text: string) {
@@ -31,7 +31,7 @@ function formatISODate(iso: string): string {
   }
 }
 
-export function LogDetails({ log, onClose }: LogDetailsProps) {
+export function LogDetails({ log, onClose, onPivotIp }: LogDetailsProps) {
   const handleCopyJson = useCallback(() => {
     if (!log) return
     copyToClipboard(JSON.stringify(log, null, 2))
@@ -99,6 +99,18 @@ export function LogDetails({ log, onClose }: LogDetailsProps) {
             <dd className="mt-1 whitespace-nowrap text-sm text-[var(--sea-ink)]">
               {field.label === 'Severity' ? (
                 <SeverityBadge severity={field.value as number} />
+              ) : field.label === 'IP Address' && onPivotIp ? (
+                <div className="flex items-center gap-1.5 group/details-ip">
+                  <span className="font-mono">{field.value}</span>
+                  <button
+                    type="button"
+                    onClick={() => onPivotIp(field.value as string)}
+                    className="opacity-0 group-hover/details-ip:opacity-100 transition-opacity p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground cursor-pointer"
+                    title={`Pivoter sur l'IP ${field.value}`}
+                  >
+                    <CornerDownRight className="size-3" />
+                  </button>
+                </div>
               ) : (
                 <span className="truncate" title={String(field.value)}>
                   {field.value}
@@ -148,6 +160,17 @@ export function LogDetails({ log, onClose }: LogDetailsProps) {
 
       {/* Action buttons */}
       <div className="flex flex-wrap gap-2">
+        {onPivotIp && log && (
+          <Button
+            size="sm"
+            variant="outline"
+            onClick={() => onPivotIp(source.source_ip)}
+            className="cursor-pointer"
+          >
+            <CornerDownRight className="size-3.5" />
+            Pivot on IP
+          </Button>
+        )}
         <Button size="sm" variant="outline" onClick={handleCopyJson}>
           <Copy className="size-3.5" />
           Copy JSON
