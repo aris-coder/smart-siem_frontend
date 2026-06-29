@@ -1,8 +1,14 @@
 import { useState, useEffect } from 'react'
+import type { FormEvent } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { useCurrentUser } from '#/lib/auth/hooks'
-import { Button } from '#/components/ui/button'
+import { updateCurrentUser } from '#/lib/auth/api'
+import { requireAuth } from '#/lib/auth/guards'
+import { getApiErrorMessage } from '#/lib/api/errors'
 import { Badge } from '#/components/ui/badge'
+import { Button } from '#/components/ui/button'
+import { Input } from '#/components/ui/input'
 import { env } from '#/env'
 import {
   Settings as SettingsIcon,
@@ -13,15 +19,20 @@ import {
   ShieldCheck,
   Globe,
   Database,
+  Save,
+  CheckCircle2,
+  AlertCircle,
 } from 'lucide-react'
 
 export const Route = createFileRoute('/settings')({
+  beforeLoad: requireAuth,
   component: SettingsPage,
 })
 
 type ThemeMode = 'light' | 'dark' | 'auto'
 
 function SettingsPage() {
+  const queryClient = useQueryClient()
   const { data: user, isLoading } = useCurrentUser()
   const [theme, setTheme] = useState<ThemeMode>(() => {
     if (typeof window !== 'undefined') {
@@ -32,13 +43,28 @@ function SettingsPage() {
     }
     return 'auto'
   })
+  const [profileUsername, setProfileUsername] = useState('')
+  const [profilePassword, setProfilePassword] = useState('')
+  const [profilePasswordConfirm, setProfilePasswordConfirm] = useState('')
+  const [profileSuccess, setProfileSuccess] = useState('')
+  const [profileError, setProfileError] = useState('')
+
+  const updateProfileMutation = useMutation({
+    mutationFn: updateCurrentUser,
+    onSuccess: (updatedUser) => {
+      queryClient.setQueryData(['auth', 'profile'], updatedUser)
+      queryClient.invalidateQueries({ queryKey: ['auth', 'profile'] })
+    },
+  })
 
   // Theme resolution logic
   useEffect(() => {
     if (typeof window === 'undefined') return
 
     const root = document.documentElement
-    const prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+    const prefersDark = window.matchMedia(
+      '(prefers-color-scheme: dark)',
+    ).matches
     const resolved = theme === 'auto' ? (prefersDark ? 'dark' : 'light') : theme
 
     root.classList.remove('light', 'dark')
@@ -53,6 +79,60 @@ function SettingsPage() {
     }
   }, [theme])
 
+  useEffect(() => {
+    if (!user) return
+    setProfileUsername(user.username)
+  }, [user])
+
+  const handleProfileSubmit = async (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    if (!user) return
+
+    setProfileSuccess('')
+    setProfileError('')
+
+    const username = profileUsername.trim()
+    const shouldUpdatePassword =
+      profilePassword.length > 0 || profilePasswordConfirm.length > 0
+
+    if (username.length < 2) {
+      setProfileError(
+        "Le nom d'utilisateur doit contenir au moins 2 caractères.",
+      )
+      return
+    }
+
+    if (shouldUpdatePassword && profilePassword.length < 6) {
+      setProfileError('Le mot de passe doit contenir au moins 6 caractères.')
+      return
+    }
+
+    if (shouldUpdatePassword && profilePassword !== profilePasswordConfirm) {
+      setProfileError('Les mots de passe ne correspondent pas.')
+      return
+    }
+
+    const payload: { username?: string; password?: string } = {}
+    if (username !== user.username) payload.username = username
+    if (shouldUpdatePassword) payload.password = profilePassword
+
+    if (Object.keys(payload).length === 0) {
+      setProfileError('Aucune modification à enregistrer.')
+      return
+    }
+
+    try {
+      await updateProfileMutation.mutateAsync(payload)
+      setProfilePassword('')
+      setProfilePasswordConfirm('')
+      setProfileSuccess('Profil mis à jour avec succès.')
+    } catch (error: unknown) {
+      setProfileError(
+        getApiErrorMessage(error, 'Impossible de mettre à jour le profil.'),
+      )
+    }
+  }
+
   const roleLabels: Record<string, string> = {
     READER: 'Lecteur (Lecture Seule)',
     ANALYST: 'Analyste (Opérations & Triage)',
@@ -62,7 +142,8 @@ function SettingsPage() {
   const roleColors: Record<string, string> = {
     READER: 'bg-zinc-100 text-zinc-800 dark:bg-zinc-800 dark:text-zinc-300',
     ANALYST: 'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
-    ADMIN: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+    ADMIN:
+      'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
   }
 
   return (
@@ -96,9 +177,21 @@ function SettingsPage() {
 
           <div className="grid grid-cols-3 gap-2">
             {[
-              { mode: 'light', label: 'Clair', icon: <Sun className="size-4" /> },
-              { mode: 'dark', label: 'Sombre', icon: <Moon className="size-4" /> },
-              { mode: 'auto', label: 'Système', icon: <Laptop className="size-4" /> },
+              {
+                mode: 'light',
+                label: 'Clair',
+                icon: <Sun className="size-4" />,
+              },
+              {
+                mode: 'dark',
+                label: 'Sombre',
+                icon: <Moon className="size-4" />,
+              },
+              {
+                mode: 'auto',
+                label: 'Système',
+                icon: <Laptop className="size-4" />,
+              },
             ].map((opt) => (
               <button
                 key={opt.mode}
@@ -147,12 +240,87 @@ function SettingsPage() {
               </div>
 
               <div className="flex items-center justify-between border-t border-[var(--line)] pt-3 text-xs">
-                <span className="text-[var(--sea-ink-soft)]">Rôle de sécurité</span>
+                <span className="text-[var(--sea-ink-soft)]">
+                  Rôle de sécurité
+                </span>
                 <Badge className={roleColors[user.role]} variant="outline">
                   <ShieldCheck className="mr-1 size-3" />
                   {roleLabels[user.role] ?? user.role}
                 </Badge>
               </div>
+
+              <form
+                className="flex flex-col gap-3 border-t border-[var(--line)] pt-4"
+                onSubmit={handleProfileSubmit}
+              >
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    Nom d'utilisateur
+                  </label>
+                  <Input
+                    value={profileUsername}
+                    onChange={(event) => setProfileUsername(event.target.value)}
+                    aria-invalid={profileError.includes('nom')}
+                    autoComplete="username"
+                  />
+                </div>
+
+                <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                      Nouveau mot de passe
+                    </label>
+                    <Input
+                      type="password"
+                      value={profilePassword}
+                      onChange={(event) =>
+                        setProfilePassword(event.target.value)
+                      }
+                      placeholder="Optionnel"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                  <div className="flex flex-col gap-1.5">
+                    <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                      Confirmation
+                    </label>
+                    <Input
+                      type="password"
+                      value={profilePasswordConfirm}
+                      onChange={(event) =>
+                        setProfilePasswordConfirm(event.target.value)
+                      }
+                      placeholder="Répéter le mot de passe"
+                      autoComplete="new-password"
+                    />
+                  </div>
+                </div>
+
+                {profileError && (
+                  <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                    <AlertCircle className="size-3.5" />
+                    {profileError}
+                  </p>
+                )}
+                {profileSuccess && (
+                  <p className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
+                    <CheckCircle2 className="size-3.5" />
+                    {profileSuccess}
+                  </p>
+                )}
+
+                <Button
+                  type="submit"
+                  size="sm"
+                  className="self-start"
+                  disabled={updateProfileMutation.isPending}
+                >
+                  <Save className="size-3.5" />
+                  {updateProfileMutation.isPending
+                    ? 'Enregistrement...'
+                    : 'Enregistrer'}
+                </Button>
+              </form>
             </div>
           ) : (
             <p className="text-xs text-muted-foreground">Déconnecté</p>
@@ -174,7 +342,9 @@ function SettingsPage() {
             <div className="flex items-start gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3">
               <Globe className="size-4 text-[var(--sea-ink-soft)] shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <p className="font-semibold text-[var(--sea-ink)]">API REST Endpoint</p>
+                <p className="font-semibold text-[var(--sea-ink)]">
+                  API REST Endpoint
+                </p>
                 <p className="mt-0.5 font-mono text-[10px] text-[var(--sea-ink-soft)] truncate">
                   {env.VITE_API_URL || 'http://localhost:3000'}
                 </p>
@@ -184,7 +354,9 @@ function SettingsPage() {
             <div className="flex items-start gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3">
               <Database className="size-4 text-[var(--sea-ink-soft)] shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <p className="font-semibold text-[var(--sea-ink)]">Websocket Server</p>
+                <p className="font-semibold text-[var(--sea-ink)]">
+                  Websocket Server
+                </p>
                 <p className="mt-0.5 font-mono text-[10px] text-[var(--sea-ink-soft)] truncate">
                   {env.VITE_WS_URL || 'http://localhost:3000'}
                 </p>

@@ -81,7 +81,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
   }))
 
   const updateField = useCallback(
-    <K extends keyof FilterState>(key: K, value: FilterState[K]) => {
+    <TKey extends keyof FilterState>(key: TKey, value: FilterState[TKey]) => {
       setFilters((prev) => ({ ...prev, [key]: value }))
     },
     [],

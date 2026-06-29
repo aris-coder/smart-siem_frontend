@@ -1,4 +1,3 @@
-import { useCallback } from 'react'
 import { cn } from '#/lib/utils'
 import { PanelLeftClose, ShieldAlert } from 'lucide-react'
 import SidebarNav from './SidebarNav'

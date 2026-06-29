@@ -1,8 +1,10 @@
 import { useCallback } from 'react'
+import { useQueryClient } from '@tanstack/react-query'
 import { useRouter } from '@tanstack/react-router'
 import { useCurrentUser } from '#/lib/auth/hooks'
+import { clearAuthToken } from '#/lib/auth/session'
 import { cn } from '#/lib/utils'
-import { Settings, LogOut, User } from 'lucide-react'
+import { Settings, LogOut } from 'lucide-react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -17,16 +19,16 @@ interface SidebarUserProps {
   collapsed: boolean
 }
 
-const TOKEN_KEY = 'smart-siem_token'
-
 export default function SidebarUser({ collapsed }: SidebarUserProps) {
   const { data: user } = useCurrentUser()
   const router = useRouter()
+  const queryClient = useQueryClient()
 
   const handleLogout = useCallback(() => {
-    localStorage.removeItem(TOKEN_KEY)
-    router.navigate({ to: '/auth/login' })
-  }, [router])
+    clearAuthToken()
+    queryClient.clear()
+    router.navigate({ to: '/auth/login', replace: true })
+  }, [queryClient, router])
 
   if (!user) return null
 
@@ -41,7 +43,7 @@ export default function SidebarUser({ collapsed }: SidebarUserProps) {
               collapsed && 'justify-center px-0',
             )}
           >
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-white text-xs font-bold uppercase text-[var(--sea-ink)] dark:bg-zinc-800 dark:text-white">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-card text-xs font-bold uppercase text-[var(--sea-ink)]">
               {user.username.charAt(0)}
             </div>
             {!collapsed && (
@@ -64,7 +66,7 @@ export default function SidebarUser({ collapsed }: SidebarUserProps) {
         >
           <DropdownMenuLabel>
             <div className="flex items-center gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-white text-sm font-bold uppercase dark:bg-zinc-800">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-card text-sm font-bold uppercase">
                 {user.username.charAt(0)}
               </div>
               <div className="flex min-w-0 flex-col">

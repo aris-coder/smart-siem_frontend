@@ -1,12 +1,16 @@
+import { useState } from 'react'
 import { z } from 'zod'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
+import { useQueryClient } from '@tanstack/react-query'
 
 import { useAppForm } from '#/hooks/demo.form'
-import { http } from '#/lib/axios'
-
-const TOKEN_KEY = 'smart-siem_token'
+import { getApiErrorMessage } from '#/lib/api/errors'
+import { login } from '#/lib/auth/api'
+import { redirectIfAuthenticated } from '#/lib/auth/guards'
+import { setAuthToken } from '#/lib/auth/session'
 
 export const Route = createFileRoute('/auth/login')({
+  beforeLoad: redirectIfAuthenticated,
   component: RouteComponent,
 })
 
@@ -20,12 +24,10 @@ const schema = z.object({
     .min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
 })
 
-interface LoginResponse {
-  access_token: string
-}
-
 function RouteComponent() {
   const router = useRouter()
+  const queryClient = useQueryClient()
+  const [submitError, setSubmitError] = useState<string | null>(null)
 
   const form = useAppForm({
     defaultValues: {
@@ -36,49 +38,24 @@ function RouteComponent() {
       onBlur: schema,
     },
     onSubmit: async ({ value }) => {
-      try {
-        const { data } = await http.post<LoginResponse>(
-          '/api/v1/auth/login',
-          value,
-        )
-        localStorage.setItem(TOKEN_KEY, data.access_token)
-        router.navigate({ to: '/' })
-      } catch (error: unknown) {
-        if (error && typeof error === 'object' && 'response' in error) {
-          const axiosErr = error as {
-            response: { data?: { message?: string | string[] } }
-          }
-          const msg = axiosErr.response.data?.message
+      setSubmitError(null)
 
-          if (Array.isArray(msg)) {
-            form.setErrorMap({
-              onSubmit: {
-                form: 'Veuillez corriger les erreurs ci-dessus',
-                fields: {
-                  username: msg.join(', '),
-                },
-              },
-            })
-          } else {
-            form.setErrorMap({
-              onSubmit: {
-                form: msg ?? 'Identifiants incorrects',
-                fields: {
-                  username: msg ?? 'Identifiants incorrects',
-                },
-              },
-            })
-          }
-        } else {
-          form.setErrorMap({
-            onSubmit: {
-              form: 'Erreur de connexion au serveur',
-              fields: {
-                username: 'Erreur de connexion au serveur',
-              },
+      try {
+        const token = await login(value)
+        setAuthToken(token)
+        await queryClient.invalidateQueries({ queryKey: ['auth'] })
+        router.navigate({ to: '/', replace: true })
+      } catch (error: unknown) {
+        const message = getApiErrorMessage(error, 'Identifiants incorrects')
+        setSubmitError(message)
+        form.setErrorMap({
+          onSubmit: {
+            form: message,
+            fields: {
+              username: message,
             },
-          })
-        }
+          },
+        })
       }
     },
   })
@@ -99,7 +76,7 @@ function RouteComponent() {
             e.stopPropagation()
             form.handleSubmit()
           }}
-          className="space-y-5"
+          className="space-y-5 [&_input]:border-zinc-700 [&_input]:bg-transparent [&_input]:text-white [&_input]:placeholder:text-zinc-500 [&_input]:focus-visible:border-blue-500 [&_input]:focus-visible:ring-blue-500/30"
         >
           <form.AppField name="username">
             {(field) => <field.TextField label="Nom d'utilisateur" />}
@@ -110,6 +87,15 @@ function RouteComponent() {
               <field.TextField label="Mot de passe" type="password" />
             )}
           </form.AppField>
+
+          {submitError && (
+            <p
+              className="rounded-lg border border-red-900/40 bg-red-950/40 px-3 py-2 text-sm text-red-200"
+              role="alert"
+            >
+              {submitError}
+            </p>
+          )}
 
           <form.AppForm>
             <form.SubscribeButton label="Se connecter" className="w-full" />

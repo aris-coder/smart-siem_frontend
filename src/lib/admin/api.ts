@@ -8,6 +8,8 @@ export interface CreateUserPayload {
 }
 
 export interface UpdateUserPayload {
+  username?: string
+  password?: string
   role?: User['role']
   is_active?: boolean
 }

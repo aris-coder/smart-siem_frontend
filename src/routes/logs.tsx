@@ -1,6 +1,7 @@
 import { useState, useCallback } from 'react'
 import { createFileRoute } from '@tanstack/react-router'
 import { useLogSearch } from '#/lib/logs/hooks'
+import { requireAuth } from '#/lib/auth/guards'
 import { LogSearch, LogFilters, LogTable, LogDetails } from '#/components/logs'
 import type { LogSearchParams, LogEntry } from '#/types'
 import type { SortingState } from '@tanstack/react-table'
@@ -12,6 +13,7 @@ import {
 } from '#/components/ui/sheet'
 
 export const Route = createFileRoute('/logs')({
+  beforeLoad: requireAuth,
   component: LogsPage,
 })
 

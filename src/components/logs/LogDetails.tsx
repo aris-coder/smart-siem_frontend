@@ -1,3 +1,4 @@
+import { useCallback } from 'react'
 import { Copy, Download, Bell, CornerDownRight } from 'lucide-react'
 import { Button } from '#/components/ui/button'
 import { Badge } from '#/components/ui/badge'
@@ -31,7 +32,7 @@ function formatISODate(iso: string): string {
   }
 }
 
-export function LogDetails({ log, onClose, onPivotIp }: LogDetailsProps) {
+export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
   const handleCopyJson = useCallback(() => {
     if (!log) return
     copyToClipboard(JSON.stringify(log, null, 2))
@@ -105,7 +106,7 @@ export function LogDetails({ log, onClose, onPivotIp }: LogDetailsProps) {
                   <button
                     type="button"
                     onClick={() => onPivotIp(field.value as string)}
-                    className="opacity-0 group-hover/details-ip:opacity-100 transition-opacity p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground cursor-pointer"
+                    className="opacity-0 group-hover/details-ip:opacity-100 transition-opacity p-0.5 rounded hover:bg-action-hover text-muted-foreground hover:text-foreground cursor-pointer"
                     title={`Pivoter sur l'IP ${field.value}`}
                   >
                     <CornerDownRight className="size-3" />
@@ -160,7 +161,7 @@ export function LogDetails({ log, onClose, onPivotIp }: LogDetailsProps) {
 
       {/* Action buttons */}
       <div className="flex flex-wrap gap-2">
-        {onPivotIp && log && (
+        {onPivotIp && (
           <Button
             size="sm"
             variant="outline"

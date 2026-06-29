@@ -8,7 +8,9 @@ import {
   deleteUser,
   getAuditTrail,
 } from '#/lib/admin/api'
-import type { CreateUserPayload, UpdateUserPayload } from '#/lib/admin/api'
+import type { UpdateUserPayload } from '#/lib/admin/api'
+import { requireAuth } from '#/lib/auth/guards'
+import { getApiErrorMessage } from '#/lib/api/errors'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
 import {
@@ -37,10 +39,11 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from '#/components/ui/alert-dialog'
-import { Plus, Pencil, Trash2 } from 'lucide-react'
+import { Plus, Pencil, Trash2, CheckCircle2, AlertCircle } from 'lucide-react'
 import type { User } from '#/types'
 
 export const Route = createFileRoute('/admin/users')({
+  beforeLoad: requireAuth,
   component: AdminUsersPage,
 })
 
@@ -61,25 +64,35 @@ function AdminUsersPage() {
   // Mutations
   const createMutation = useMutation({
     mutationFn: createUser,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      queryClient.invalidateQueries({ queryKey: ['audit', 'trail'] })
+    },
   })
   const updateMutation = useMutation({
     mutationFn: ({ id, payload }: { id: string; payload: UpdateUserPayload }) =>
       updateUser(id, payload),
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      queryClient.invalidateQueries({ queryKey: ['audit', 'trail'] })
+    },
   })
   const deleteMutation = useMutation({
     mutationFn: deleteUser,
-    onSuccess: () =>
-      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] }),
+    onSuccess: () => {
+      queryClient.invalidateQueries({ queryKey: ['admin', 'users'] })
+      queryClient.invalidateQueries({ queryKey: ['audit', 'trail'] })
+    },
   })
 
   // Dialogs
   const [createOpen, setCreateOpen] = useState(false)
   const [editUser, setEditUser] = useState<User | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<User | null>(null)
+  const [feedback, setFeedback] = useState<{
+    type: 'success' | 'error'
+    message: string
+  } | null>(null)
 
   // Create form
   const [newUsername, setNewUsername] = useState('')
@@ -88,14 +101,31 @@ function AdminUsersPage() {
   const [createError, setCreateError] = useState('')
 
   // Edit form
+  const [editUsername, setEditUsername] = useState('')
   const [editRole, setEditRole] = useState<User['role']>('READER')
+  const [editPassword, setEditPassword] = useState('')
   const [editActive, setEditActive] = useState(true)
+  const [editError, setEditError] = useState('')
 
   const handleCreate = useCallback(async () => {
     setCreateError('')
+    setFeedback(null)
+
+    const username = newUsername.trim()
+    if (username.length < 2) {
+      setCreateError(
+        "Le nom d'utilisateur doit contenir au moins 2 caractères.",
+      )
+      return
+    }
+    if (newPassword.length < 6) {
+      setCreateError('Le mot de passe doit contenir au moins 6 caractères.')
+      return
+    }
+
     try {
       await createMutation.mutateAsync({
-        username: newUsername,
+        username,
         password: newPassword,
         role: newRole,
       })
@@ -103,41 +133,94 @@ function AdminUsersPage() {
       setNewUsername('')
       setNewPassword('')
       setNewRole('READER')
+      setFeedback({
+        type: 'success',
+        message: 'Utilisateur créé avec succès.',
+      })
     } catch (err: unknown) {
-      const axiosErr = err as { response?: { data?: { message?: string } } }
       setCreateError(
-        axiosErr.response?.data?.message || 'Failed to create user',
+        getApiErrorMessage(err, "Impossible de créer l'utilisateur."),
       )
     }
   }, [newUsername, newPassword, newRole, createMutation])
 
   const handleEdit = useCallback(async () => {
     if (!editUser) return
+    setEditError('')
+    setFeedback(null)
+
+    const username = editUsername.trim()
+    if (username.length < 2) {
+      setEditError("Le nom d'utilisateur doit contenir au moins 2 caractères.")
+      return
+    }
+    if (editPassword.length > 0 && editPassword.length < 6) {
+      setEditError('Le mot de passe doit contenir au moins 6 caractères.')
+      return
+    }
+
+    const payload: UpdateUserPayload = {
+      username,
+      role: editRole,
+      is_active: editActive,
+    }
+    if (editPassword.length > 0) {
+      payload.password = editPassword
+    }
+
     try {
       await updateMutation.mutateAsync({
         id: editUser.id,
-        payload: { role: editRole, is_active: editActive },
+        payload,
       })
       setEditUser(null)
-    } catch {
-      // silent
+      setEditPassword('')
+      setFeedback({
+        type: 'success',
+        message: 'Utilisateur mis à jour avec succès.',
+      })
+    } catch (err: unknown) {
+      setEditError(
+        getApiErrorMessage(err, "Impossible de mettre à jour l'utilisateur."),
+      )
     }
-  }, [editUser, editRole, editActive, updateMutation])
+  }, [
+    editUser,
+    editUsername,
+    editRole,
+    editPassword,
+    editActive,
+    updateMutation,
+  ])
 
   const handleDelete = useCallback(async () => {
     if (!deleteTarget) return
+    setFeedback(null)
     try {
       await deleteMutation.mutateAsync(deleteTarget.id)
       setDeleteTarget(null)
-    } catch {
-      // silent
+      setFeedback({
+        type: 'success',
+        message: 'Utilisateur supprimé avec succès.',
+      })
+    } catch (err: unknown) {
+      setFeedback({
+        type: 'error',
+        message: getApiErrorMessage(
+          err,
+          "Impossible de supprimer l'utilisateur.",
+        ),
+      })
     }
   }, [deleteTarget, deleteMutation])
 
   const openEdit = useCallback((user: User) => {
     setEditUser(user)
+    setEditUsername(user.username)
     setEditRole(user.role)
+    setEditPassword('')
     setEditActive(user.is_active !== false)
+    setEditError('')
   }, [])
 
   const roleLabel: Record<User['role'], string> = {
@@ -168,6 +251,23 @@ function AdminUsersPage() {
           Add User
         </Button>
       </div>
+
+      {feedback && (
+        <div
+          className={`flex items-center gap-2 rounded-lg border px-3 py-2 text-xs ${
+            feedback.type === 'success'
+              ? 'border-green-200 bg-green-50 text-green-700 dark:border-green-900/50 dark:bg-green-900/20 dark:text-green-300'
+              : 'border-red-200 bg-red-50 text-red-700 dark:border-red-900/50 dark:bg-red-900/20 dark:text-red-300'
+          }`}
+        >
+          {feedback.type === 'success' ? (
+            <CheckCircle2 className="size-3.5" />
+          ) : (
+            <AlertCircle className="size-3.5" />
+          )}
+          {feedback.message}
+        </div>
+      )}
 
       {/* Users table */}
       <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-white dark:bg-zinc-900">
@@ -370,7 +470,13 @@ function AdminUsersPage() {
       </div>
 
       {/* Create User Dialog */}
-      <Dialog open={createOpen} onOpenChange={setCreateOpen}>
+      <Dialog
+        open={createOpen}
+        onOpenChange={(open) => {
+          setCreateOpen(open)
+          if (!open) setCreateError('')
+        }}
+      >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Create User</DialogTitle>
@@ -388,6 +494,7 @@ function AdminUsersPage() {
                 value={newUsername}
                 onChange={(e) => setNewUsername(e.target.value)}
                 placeholder="username"
+                aria-invalid={Boolean(createError)}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -399,6 +506,7 @@ function AdminUsersPage() {
                 value={newPassword}
                 onChange={(e) => setNewPassword(e.target.value)}
                 placeholder="Minimum 6 characters"
+                aria-invalid={Boolean(createError)}
               />
             </div>
             <div className="flex flex-col gap-1.5">
@@ -438,17 +546,35 @@ function AdminUsersPage() {
       {/* Edit User Dialog */}
       <Dialog
         open={editUser !== null}
-        onOpenChange={(open) => !open && setEditUser(null)}
+        onOpenChange={(open) => {
+          if (!open) {
+            setEditUser(null)
+            setEditPassword('')
+            setEditError('')
+          }
+        }}
       >
         <DialogContent>
           <DialogHeader>
             <DialogTitle>Edit User</DialogTitle>
             <DialogDescription>
-              Update role or status for {editUser?.username}
+              Update name, role, password, or status for {editUser?.username}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-4">
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                Username
+              </label>
+              <Input
+                value={editUsername}
+                onChange={(e) => setEditUsername(e.target.value)}
+                placeholder="username"
+                aria-invalid={Boolean(editError)}
+                autoComplete="username"
+              />
+            </div>
             <div className="flex flex-col gap-1.5">
               <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
                 Role
@@ -467,6 +593,19 @@ function AdminUsersPage() {
                 </SelectContent>
               </Select>
             </div>
+            <div className="flex flex-col gap-1.5">
+              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                New password
+              </label>
+              <Input
+                type="password"
+                value={editPassword}
+                onChange={(e) => setEditPassword(e.target.value)}
+                placeholder="Leave empty to keep current password"
+                aria-invalid={Boolean(editError)}
+                autoComplete="new-password"
+              />
+            </div>
             <label className="flex items-center gap-2 text-sm text-[var(--sea-ink)]">
               <input
                 type="checkbox"
@@ -476,6 +615,12 @@ function AdminUsersPage() {
               />
               Account active
             </label>
+            {editError && (
+              <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                <AlertCircle className="size-3.5" />
+                {editError}
+              </p>
+            )}
           </div>
 
           <DialogFooter>

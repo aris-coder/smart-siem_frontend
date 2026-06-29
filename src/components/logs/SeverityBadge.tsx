@@ -8,27 +8,27 @@ const SEVERITY_CONFIG: Record<
   info: {
     label: 'INFO',
     className:
-      'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+      'bg-severity-info-bg text-severity-info-text border-severity-info-border',
   },
   warning: {
     label: 'WARNING',
     className:
-      'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
+      'bg-severity-warning-bg text-severity-warning-text border-severity-warning-border',
   },
   high: {
     label: 'HIGH',
     className:
-      'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
+      'bg-severity-high-bg text-severity-high-text border-severity-high-border',
   },
   critical: {
     label: 'CRITICAL',
     className:
-      'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
+      'bg-severity-critical-bg text-severity-critical-text border-severity-critical-border',
   },
   emergency: {
     label: 'EMERGENCY',
     className:
-      'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
+      'bg-severity-emergency-bg text-severity-emergency-text border-severity-emergency-border',
   },
 }
 

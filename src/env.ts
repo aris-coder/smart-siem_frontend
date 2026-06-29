@@ -1,6 +1,17 @@
 import { createEnv } from '@t3-oss/env-core'
 import { z } from 'zod'
 
+const urlOrPath = z.string().min(1).refine((value) => {
+  if (value.startsWith('/')) return true
+
+  try {
+    new URL(value)
+    return true
+  } catch {
+    return false
+  }
+}, 'Expected an absolute URL or a same-origin path.')
+
 export const env = createEnv({
   server: {
     SERVER_URL: z.string().url().optional(),
@@ -14,8 +25,8 @@ export const env = createEnv({
 
   client: {
     VITE_APP_TITLE: z.string().min(1).optional(),
-    VITE_API_URL: z.url(),
-    VITE_WS_URL: z.url()
+    VITE_API_URL: urlOrPath.default('http://localhost:3000'),
+    VITE_WS_URL: urlOrPath.default('http://localhost:3000'),
   },
 
   /**

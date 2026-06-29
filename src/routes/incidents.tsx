@@ -35,34 +35,34 @@ export const Route = createFileRoute('/incidents')({
 })
 
 const severityColors: Record<IncidentSeverity, string> = {
-  CRITICAL: 'bg-red-100 text-red-800 dark:bg-red-900/40 dark:text-red-300',
-  HIGH: 'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
+  CRITICAL: 'bg-severity-critical-bg text-severity-critical-text border-severity-critical-border',
+  HIGH: 'bg-severity-high-bg text-severity-high-text border-severity-high-border',
   WARNING:
-    'bg-yellow-100 text-yellow-800 dark:bg-yellow-900/40 dark:text-yellow-300',
-  INFO: 'bg-gray-100 text-gray-700 dark:bg-gray-800 dark:text-gray-300',
+    'bg-severity-warning-bg text-severity-warning-text border-severity-warning-border',
+  INFO: 'bg-severity-info-bg text-severity-info-text border-severity-info-border',
 }
 
 const severityIcons: Record<IncidentSeverity, React.ReactNode> = {
   CRITICAL: (
-    <ShieldAlert className="size-4 shrink-0 text-red-600 dark:text-red-400" />
+    <ShieldAlert className="size-4 shrink-0 text-severity-critical-icon" />
   ),
   HIGH: (
-    <AlertTriangle className="size-4 shrink-0 text-orange-600 dark:text-orange-400" />
+    <AlertTriangle className="size-4 shrink-0 text-severity-high-icon" />
   ),
   WARNING: (
-    <AlertCircle className="size-4 shrink-0 text-yellow-600 dark:text-yellow-400" />
+    <AlertCircle className="size-4 shrink-0 text-severity-warning-icon" />
   ),
-  INFO: <Info className="size-4 shrink-0 text-gray-500 dark:text-gray-400" />,
+  INFO: <Info className="size-4 shrink-0 text-severity-info-icon" />,
 }
 
 const statusColors: Record<IncidentStatus, string> = {
-  OPEN: 'bg-zinc-900 text-white dark:bg-white dark:text-zinc-900',
+  OPEN: 'bg-status-open-bg text-status-open-text',
   IN_PROGRESS:
-    'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+    'bg-status-inprogress-bg text-status-inprogress-text border border-status-inprogress-border',
   RESOLVED:
-    'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+    'bg-status-resolved-bg text-status-resolved-text border border-status-resolved-border',
   FALSE_POSITIVE:
-    'bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400',
+    'bg-status-falsepositive-bg text-status-falsepositive-text border border-status-falsepositive-border',
 }
 
 function IncidentsPage() {
@@ -161,12 +161,12 @@ function IncidentsPage() {
           {
             label: 'Critical Alerts',
             value: stats?.critical_alerts ?? '—',
-            tone: 'text-red-600 dark:text-red-400',
+            tone: 'text-severity-critical-icon',
           },
           {
             label: 'High Alerts',
             value: stats?.high_alerts ?? '—',
-            tone: 'text-orange-600 dark:text-orange-400',
+            tone: 'text-severity-high-icon',
           },
           {
             label: 'Open Incidents',
@@ -176,12 +176,12 @@ function IncidentsPage() {
           {
             label: 'System',
             value: stats?.system_status ?? '—',
-            tone: 'text-green-600 dark:text-green-400',
+            tone: 'text-status-resolved-text',
           },
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900"
+            className="rounded-xl border border-[var(--line)] bg-card p-4"
           >
             <p className="text-xs text-[var(--sea-ink-soft)]">{stat.label}</p>
             <p className={`mt-1 text-2xl font-semibold ${stat.tone}`}>
@@ -200,7 +200,7 @@ function IncidentsPage() {
             onClick={() => setStatusTab(tab.key)}
             className={`px-4 py-2.5 text-xs font-medium transition-colors ${
               statusTab === tab.key
-                ? 'border-b-2 border-[var(--sea-ink)] text-[var(--sea-ink)]'
+                ? 'border-b-2 border-primary text-[var(--sea-ink)]'
                 : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'
             }`}
           >
@@ -225,7 +225,7 @@ function IncidentsPage() {
               key={incident.id}
               type="button"
               onClick={() => handleSelectIncident(incident)}
-              className="flex w-full items-start gap-3 rounded-xl border border-[var(--line)] bg-white p-4 text-left transition-colors hover:bg-[var(--link-bg-hover)] dark:bg-zinc-900"
+              className="flex w-full items-start gap-3 rounded-xl border border-[var(--line)] bg-card p-4 text-left transition-colors hover:bg-[var(--link-bg-hover)]"
             >
               {severityIcons[incident.severity]}
               <div className="flex-1 min-w-0">

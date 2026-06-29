@@ -1,0 +1,224 @@
+/* src/theme.css */
+:root {
+  /* Brand colors */
+  --primary-base: #08B6D4;
+  --secondary-base: #F59E0B;
+  --tertiary-base: #6366F1;
+  --neutral-base: #64748B;
+
+  /* Theme mappings for components (light mode) */
+  --background: #f4f7fa; /* Light grey/blue background */
+  --foreground: #0f172a; /* Dark slate text */
+  
+  --card: #ffffff;
+  --card-foreground: #0f172a;
+
+  --popover: #ffffff;
+  --popover-foreground: #0f172a;
+
+  --primary: #007c84; /* High contrast dark teal for primary actions (buttons) with white text */
+  --primary-foreground: #ffffff;
+
+  --secondary: #f59e0b; /* Amber */
+  --secondary-foreground: #ffffff;
+
+  --tertiary: #6366F1; /* Indigo */
+  --tertiary-foreground: #ffffff;
+
+  --neutral: #64748B; /* Slate */
+  --neutral-foreground: #ffffff;
+
+  --muted: #f1f5f9;
+  --muted-foreground: #64748b;
+
+  --accent: #f1f5f9;
+  --accent-foreground: #0f172a;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #e2e8f0;
+  --input: #e2e8f0;
+  --ring: #08b6d4;
+
+  /* Custom palette colors for direct use in layouts */
+  --color-primary: #08B6D4;
+  --color-secondary: #F59E0B;
+  --color-tertiary: #6366F1;
+  --color-neutral: #64748B;
+
+  /* Custom Layout & Typography Colors */
+  --sea-ink: #0f172a; /* Dark text */
+  --sea-ink-soft: #64748b; /* Muted text */
+  --lagoon: #334155;
+  --lagoon-deep: #0f172a;
+  --palm: #475569;
+  --sand: #f8fafc;
+  --foam: #ffffff;
+  --surface: rgba(255, 255, 255, 0.75);
+  --surface-strong: rgba(255, 255, 255, 0.95);
+  --line: rgba(148, 163, 184, 0.15);
+  --inset-glint: rgba(255, 255, 255, 0.85);
+  --kicker: #64748b;
+  --bg-base: #f4f7fa;
+  --header-bg: rgba(255, 255, 255, 0.8);
+  --chip-bg: rgba(241, 245, 249, 0.8);
+  --chip-line: rgba(148, 163, 184, 0.2);
+  --link-bg-hover: rgba(8, 182, 212, 0.08); /* hover with primary tint */
+
+  /* Severities (light mode) */
+  --severity-info-bg: #f8fafc;
+  --severity-info-text: #475569;
+  --severity-info-border: #cbd5e1;
+  --severity-info-icon: #64748b;
+
+  --severity-warning-bg: #fffbeb;
+  --severity-warning-text: #b45309;
+  --severity-warning-border: #fde68a;
+  --severity-warning-icon: #d97706;
+
+  --severity-high-bg: #fff7ed;
+  --severity-high-text: #c2410c;
+  --severity-high-border: #fed7aa;
+  --severity-high-icon: #ea580c;
+
+  --severity-critical-bg: #fef2f2;
+  --severity-critical-text: #b91c1c;
+  --severity-critical-border: #fecaca;
+  --severity-critical-icon: #dc2626;
+
+  --severity-emergency-bg: #faf5ff;
+  --severity-emergency-text: #6b21a8;
+  --severity-emergency-border: #e9d5ff;
+  --severity-emergency-icon: #8b5cf6;
+
+  /* Statuses (light mode) */
+  --status-open-bg: #0f172a;
+  --status-open-text: #ffffff;
+
+  --status-inprogress-bg: #eff6ff;
+  --status-inprogress-text: #1d4ed8;
+  --status-inprogress-border: #bfdbfe;
+
+  --status-resolved-bg: #f0fdf4;
+  --status-resolved-text: #15803d;
+  --status-resolved-border: #bbf7d0;
+
+  --status-falsepositive-bg: #f8fafc;
+  --status-falsepositive-text: #475569;
+  --status-falsepositive-border: #cbd5e1;
+
+  --status-active-bg: #f0fdf4;
+  --status-active-border: #bbf7d0;
+  --status-active-text: #166534;
+
+  --status-inactive-bg: #fef2f2;
+  --status-inactive-border: #fecaca;
+  --status-inactive-text: #991b1b;
+}
+
+.dark {
+  /* Theme mappings for components (dark mode) */
+  --background: #0b0f19; /* Deep dark blueish grey background */
+  --foreground: #f8fafc;
+  
+  --card: #111827;
+  --card-foreground: #f8fafc;
+
+  --popover: #111827;
+  --popover-foreground: #f8fafc;
+
+  --primary: #08B6D4; /* In dark mode, cyan is high-contrast enough */
+  --primary-foreground: #0b0f19;
+
+  --secondary: #F59E0B;
+  --secondary-foreground: #0b0f19;
+
+  --tertiary: #6366F1;
+  --tertiary-foreground: #ffffff;
+
+  --neutral: #64748B;
+  --neutral-foreground: #ffffff;
+
+  --muted: #1f2937;
+  --muted-foreground: #9ca3af;
+
+  --accent: #1f2937;
+  --accent-foreground: #f8fafc;
+
+  --destructive: #ef4444;
+  --destructive-foreground: #ffffff;
+
+  --border: #1f2937;
+  --input: #1f2937;
+  --ring: #08b6d4;
+
+  /* Custom Layout & Typography Colors (dark mode) */
+  --sea-ink: #f8fafc;
+  --sea-ink-soft: #94a3b8;
+  --lagoon: #cbd5e1;
+  --lagoon-deep: #f8fafc;
+  --palm: #94a3b8;
+  --sand: #0f172a;
+  --foam: #0b0f19;
+  --surface: rgba(17, 24, 39, 0.75);
+  --surface-strong: rgba(17, 24, 39, 0.95);
+  --line: rgba(148, 163, 184, 0.12);
+  --inset-glint: rgba(255, 255, 255, 0.05);
+  --kicker: #94a3b8;
+  --bg-base: #0b0f19;
+  --header-bg: rgba(11, 15, 25, 0.8);
+  --chip-bg: rgba(17, 24, 39, 0.8);
+  --chip-line: rgba(148, 163, 184, 0.15);
+  --link-bg-hover: rgba(8, 182, 212, 0.12);
+
+  /* Severities (dark mode) */
+  --severity-info-bg: rgba(71, 85, 105, 0.15);
+  --severity-info-text: #cbd5e1;
+  --severity-info-border: rgba(203, 213, 225, 0.2);
+  --severity-info-icon: #94a3b8;
+
+  --severity-warning-bg: rgba(245, 158, 11, 0.15);
+  --severity-warning-text: #fde047;
+  --severity-warning-border: rgba(253, 230, 138, 0.2);
+  --severity-warning-icon: #fbbf24;
+
+  --severity-high-bg: rgba(234, 88, 12, 0.15);
+  --severity-high-text: #ffedd5;
+  --severity-high-border: rgba(254, 215, 170, 0.2);
+  --severity-high-icon: #f97316;
+
+  --severity-critical-bg: rgba(239, 68, 68, 0.15);
+  --severity-critical-text: #fecaca;
+  --severity-critical-border: rgba(254, 202, 202, 0.2);
+  --severity-critical-icon: #f87171;
+
+  --severity-emergency-bg: rgba(139, 92, 246, 0.15);
+  --severity-emergency-text: #f3e8ff;
+  --severity-emergency-border: rgba(233, 213, 255, 0.2);
+  --severity-emergency-icon: #a78bfa;
+
+  /* Statuses (dark mode) */
+  --status-open-bg: #f8fafc;
+  --status-open-text: #0b0f19;
+
+  --status-inprogress-bg: rgba(59, 130, 246, 0.15);
+  --status-inprogress-text: #93c5fd;
+  --status-inprogress-border: rgba(191, 219, 254, 0.2);
+
+  --status-resolved-bg: rgba(34, 197, 94, 0.15);
+  --status-resolved-text: #86efac;
+  --status-resolved-border: rgba(187, 247, 208, 0.2);
+
+  --status-falsepositive-bg: rgba(71, 85, 105, 0.15);
+  --status-falsepositive-text: #cbd5e1;
+  --status-falsepositive-border: rgba(203, 213, 225, 0.2);
+
+  --status-active-bg: rgba(34, 197, 94, 0.1);
+  --status-active-border: rgba(34, 197, 94, 0.2);
+  --status-active-text: #4ade80;
+
+  --status-inactive-bg: rgba(239, 68, 68, 0.1);
+  --status-inactive-border: rgba(239, 68, 68, 0.2);
+  --status-inactive-text: #f87171;
+}

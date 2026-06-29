@@ -1,4 +1,5 @@
-import { useEffect, useState, useRef, type ChangeEvent } from 'react'
+import { useEffect, useRef, useState } from 'react'
+import type { ChangeEvent } from 'react'
 import { Search } from 'lucide-react'
 import { Input } from '#/components/ui/input'
 

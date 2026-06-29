@@ -1,13 +1,12 @@
 import { useMemo } from 'react'
 import {
+  createColumnHelper,
   flexRender,
   getCoreRowModel,
   getSortedRowModel,
   useReactTable,
-  createColumnHelper,
-  type SortingState,
-  type Row,
 } from '@tanstack/react-table'
+import type { Row, SortingState } from '@tanstack/react-table'
 import {
   ArrowUpDown,
   ArrowUp,
@@ -180,7 +179,7 @@ export function LogTable({
                     e.stopPropagation()
                     onPivotIp(ip)
                   }}
-                  className="opacity-0 group-hover/ip:opacity-100 transition-opacity p-0.5 rounded hover:bg-zinc-200 dark:hover:bg-zinc-800 text-muted-foreground hover:text-foreground cursor-pointer"
+                  className="opacity-0 group-hover/ip:opacity-100 transition-opacity p-0.5 rounded hover:bg-action-hover text-muted-foreground hover:text-foreground cursor-pointer"
                   title={`Pivoter sur l'IP ${ip}`}
                 >
                   <CornerDownRight className="size-3" />
@@ -249,11 +248,11 @@ export function LogTable({
         cell: ({ getValue }) => {
           const value = getValue()
           const colorMap: Record<string, string> = {
-            success: 'text-green-600 dark:text-green-400',
-            failure: 'text-red-600 dark:text-red-400',
-            allow: 'text-green-600 dark:text-green-400',
-            deny: 'text-red-600 dark:text-red-400',
-            error: 'text-red-600 dark:text-red-400',
+            success: 'text-status-resolved-text',
+            failure: 'text-status-inactive-text',
+            allow: 'text-status-resolved-text',
+            deny: 'text-status-inactive-text',
+            error: 'text-status-inactive-text',
           }
           return (
             <span
@@ -268,7 +267,7 @@ export function LogTable({
         },
       }),
     ],
-    [],
+    [onPivotIp],
   )
 
   const table = useReactTable({
@@ -349,9 +348,9 @@ export function LogTable({
 
   return (
     <div className="island-shell rounded-xl overflow-hidden">
-      <div className="overflow-x-auto">
+      <div className="max-h-[60vh] overflow-auto">
         <table className="w-full">
-          <thead>
+          <thead className="sticky top-0 z-10 bg-card">
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
                 key={headerGroup.id}

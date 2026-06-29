@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats, listIncidents } from '#/lib/incidents/api'
 import { searchLogs } from '#/lib/logs/api'
 import { useCurrentUser } from '#/lib/auth/hooks'
+import { requireAuth } from '#/lib/auth/guards'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { SeverityBadge } from '#/components/logs/SeverityBadge'
@@ -15,7 +16,10 @@ import {
   ChevronRight,
 } from 'lucide-react'
 
-export const Route = createFileRoute('/')({ component: Dashboard })
+export const Route = createFileRoute('/')({
+  beforeLoad: requireAuth,
+  component: Dashboard,
+})
 
 function Dashboard() {
   const { data: user } = useCurrentUser()
