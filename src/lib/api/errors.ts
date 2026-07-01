@@ -1,54 +1,17 @@
-import axios from 'axios'
-
-type ApiErrorBody = {
-  message?: unknown
-  error?: unknown
-}
-
-function stringifyMessage(message: unknown): string | null {
-  if (typeof message === 'string' && message.trim()) {
-    return message
-  }
-
-  if (Array.isArray(message)) {
-    const parts = message.filter(
-      (part): part is string => typeof part === 'string' && part.trim() !== '',
-    )
-    return parts.length > 0 ? parts.join(', ') : null
-  }
-
-  return null
-}
-
-export function isUnauthorizedError(error: unknown): boolean {
-  return axios.isAxiosError(error) && error.response?.status === 401
-}
-
 export function getApiErrorMessage(
   error: unknown,
-  fallback = 'Une erreur inattendue est survenue.',
+  fallback = 'Une erreur est survenue.',
 ): string {
-  if (axios.isAxiosError<ApiErrorBody>(error)) {
-    const responseData = error.response ? error.response.data : undefined
-    const responseMessage =
-      stringifyMessage(responseData?.message) ?? stringifyMessage(responseData?.error)
-
-    if (responseMessage) {
-      return responseMessage
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosErr = error as {
+      response?: { data?: { message?: string | string[] } }
     }
-
-    if (error.code === 'ECONNABORTED') {
-      return 'Le serveur met trop de temps a repondre.'
-    }
-
-    if (!error.response) {
-      return "Impossible de joindre l'API. Verifiez que le backend est lance."
-    }
+    const msg = axiosErr.response?.data?.message
+    if (Array.isArray(msg)) return msg.join(', ')
+    if (typeof msg === 'string' && msg.length > 0) return msg
   }
 
-  if (error instanceof Error && error.message.trim()) {
-    return error.message
-  }
+  if (error instanceof Error) return error.message
 
   return fallback
 }

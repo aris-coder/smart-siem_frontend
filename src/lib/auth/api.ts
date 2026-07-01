@@ -11,29 +11,36 @@ export interface UpdateProfilePayload {
   password?: string
 }
 
-interface LoginResponse {
+export interface LoginResponseData {
   access_token?: string
-  accessToken?: string
-  token?: string
+  mfa_required?: boolean
+  session_id?: string
+  user?: User
 }
 
-function extractAccessToken(response: LoginResponse): string {
-  const token = response.access_token ?? response.accessToken ?? response.token
-
-  if (!token) {
-    throw new Error("La reponse d'authentification ne contient pas de token.")
-  }
-
-  return token
+interface VerifyMfaPayload {
+  session_id: string
+  code: string
 }
 
-export async function login(credentials: LoginCredentials): Promise<string> {
-  const { data } = await http.post<LoginResponse>(
+export async function login(
+  credentials: LoginCredentials,
+): Promise<LoginResponseData> {
+  const { data } = await http.post<LoginResponseData>(
     '/api/v1/auth/login',
     credentials,
   )
+  return data
+}
 
-  return extractAccessToken(data)
+export async function verifyMfa(
+  payload: VerifyMfaPayload,
+): Promise<LoginResponseData> {
+  const { data } = await http.post<LoginResponseData>(
+    '/api/v1/auth/mfa/verify',
+    payload,
+  )
+  return data
 }
 
 export async function getCurrentUser(): Promise<User> {

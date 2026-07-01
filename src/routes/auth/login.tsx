@@ -1,17 +1,16 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import { z } from 'zod'
 import { createFileRoute, useRouter } from '@tanstack/react-router'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { useAppForm } from '#/hooks/demo.form'
 import { getApiErrorMessage } from '#/lib/api/errors'
-import { login } from '#/lib/auth/api'
+import { login, verifyMfa } from '#/lib/auth/api'
 import { redirectIfAuthenticated } from '#/lib/auth/guards'
 import { setAuthToken } from '#/lib/auth/session'
-import { getMfaPolicy, type MfaPolicy } from '#/lib/auth/mfa'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
-import { Inbox, RefreshCw, ArrowLeft, AlertCircle } from 'lucide-react'
+import { ArrowLeft, AlertCircle } from 'lucide-react'
 
 export const Route = createFileRoute('/auth/login')({
   beforeLoad: redirectIfAuthenticated,
@@ -28,6 +27,10 @@ const schema = z.object({
     .min(6, 'Le mot de passe doit contenir au moins 6 caractères'),
 })
 
+const CODE_SCHEMA = z
+  .string()
+  .length(6, 'Le code doit contenir exactement 6 chiffres')
+
 function RouteComponent() {
   const router = useRouter()
   const queryClient = useQueryClient()
@@ -35,97 +38,76 @@ function RouteComponent() {
 
   // MFA Flow States
   const [step, setStep] = useState<'credentials' | 'mfa'>('credentials')
-  const [tempToken, setTempToken] = useState('')
-  const [usernameState, setUsernameState] = useState('')
+  const [sessionId, setSessionId] = useState('')
   const [mfaCode, setMfaCode] = useState('')
-  const [generatedCode, setGeneratedCode] = useState('')
-  const [attemptsLeft, setAttemptsLeft] = useState(3)
-  const [expiryTime, setExpiryTime] = useState<Date | null>(null)
-  const [cooldownLeft, setCooldownLeft] = useState(0)
-  const [policy, setPolicy] = useState<MfaPolicy | null>(null)
-  const [emailSimVisible, setEmailSimVisible] = useState(true)
-  const [timeLeft, setTimeLeft] = useState(0)
+  const [timeLeft, setTimeLeft] = useState(300) // 5 minute countdown
+  const [isVerifying, setIsVerifying] = useState(false)
 
   // Countdown timer for code validity
   useEffect(() => {
-    if (step !== 'mfa' || !expiryTime) return
+    if (step !== 'mfa' || timeLeft <= 0) return
 
     const interval = setInterval(() => {
-      const remaining = Math.max(0, Math.round((expiryTime.getTime() - Date.now()) / 1000))
-      setTimeLeft(remaining)
-      if (remaining === 0) {
-        clearInterval(interval)
-      }
-    }, 500)
-
-    return () => clearInterval(interval)
-  }, [step, expiryTime])
-
-  // Cooldown timer for resending
-  useEffect(() => {
-    if (cooldownLeft <= 0) return
-
-    const timer = setTimeout(() => {
-      setCooldownLeft((c) => c - 1)
+      setTimeLeft((t) => Math.max(0, t - 1))
     }, 1000)
 
-    return () => clearTimeout(timer)
-  }, [cooldownLeft])
+    return () => clearInterval(interval)
+  }, [step, timeLeft])
 
-  const generateAndSendMfaCode = (activePolicy: MfaPolicy, username: string) => {
-    const code = Math.floor(100000 + Math.random() * 900000).toString()
-    setGeneratedCode(code)
-    const expiry = new Date(Date.now() + activePolicy.validitySeconds * 1000)
-    setExpiryTime(expiry)
-    setCooldownLeft(activePolicy.resendCooldownSeconds)
-    console.log(`[SIEM MFA] Code sent to ${username}@siem-corp.local: ${code}`)
-  }
+  const handleMfaSubmit = useCallback(
+    async (e: React.FormEvent) => {
+      e.preventDefault()
+      setSubmitError(null)
 
-  const handleMfaSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setSubmitError(null)
-
-    if (!mfaCode.trim()) {
-      setSubmitError('Veuillez entrer le code de vérification.')
-      return
-    }
-
-    if (timeLeft <= 0) {
-      setSubmitError('Le code de vérification a expiré. Veuillez en renvoyer un.')
-      return
-    }
-
-    if (mfaCode.trim() !== generatedCode) {
-      const nextAttempts = attemptsLeft - 1
-      setAttemptsLeft(nextAttempts)
-      if (nextAttempts <= 0) {
-        setStep('credentials')
-        setSubmitError('Nombre maximum de tentatives atteint. Veuillez vous reconnecter.')
-        setMfaCode('')
-        setGeneratedCode('')
-        setExpiryTime(null)
-      } else {
-        setSubmitError(`Code incorrect. ${nextAttempts} tentative(s) restante(s).`)
+      const parsed = CODE_SCHEMA.safeParse(mfaCode)
+      if (!parsed.success) {
+        setSubmitError('Veuillez entrer un code de 6 chiffres.')
+        return
       }
-      return
-    }
 
-    // Success! Save token and redirect
-    try {
-      setAuthToken(tempToken)
-      await queryClient.invalidateQueries({ queryKey: ['auth'] })
-      router.navigate({ to: '/', replace: true })
-    } catch {
-      setSubmitError('Une erreur est survenue lors de la finalisation de la connexion.')
-    }
-  }
+      if (timeLeft <= 0) {
+        setSubmitError('Le code a expiré. Veuillez vous reconnecter.')
+        return
+      }
 
-  const handleResendCode = () => {
-    if (cooldownLeft > 0 || !policy) return
-    setSubmitError(null)
-    setMfaCode('')
-    generateAndSendMfaCode(policy, usernameState)
-  }
+      setIsVerifying(true)
+      try {
+        const data = await verifyMfa({
+          session_id: sessionId,
+          code: parsed.data,
+        })
+
+        if (data.access_token) {
+          setAuthToken(data.access_token)
+          await queryClient.invalidateQueries({ queryKey: ['auth'] })
+          router.navigate({ to: '/', replace: true })
+        } else {
+          setSubmitError('Réponse inattendue du serveur.')
+        }
+      } catch (error: unknown) {
+        const message = getApiErrorMessage(
+          error,
+          'Code invalide. Veuillez réessayer.',
+        )
+        setSubmitError(message)
+
+        // If code expired or already used, redirect back to login
+        if (
+          message.toLowerCase().includes('expir') ||
+          message.toLowerCase().includes('déjà utilisé')
+        ) {
+          setTimeout(() => {
+            setStep('credentials')
+            setMfaCode('')
+            setSubmitError('Session expirée. Veuillez vous reconnecter.')
+          }, 2000)
+        }
+      } finally {
+        setIsVerifying(false)
+      }
+    },
+    [mfaCode, timeLeft, sessionId, queryClient, router],
+  )
 
   const credentialsForm = useAppForm({
     defaultValues: {
@@ -139,21 +121,18 @@ function RouteComponent() {
       setSubmitError(null)
 
       try {
-        const token = await login(value)
-        setUsernameState(value.username)
-        
-        const activePolicy = getMfaPolicy()
-        setPolicy(activePolicy)
+        const data = await login(value)
 
-        if (activePolicy.enabled) {
-          setTempToken(token)
-          setAttemptsLeft(activePolicy.maxAttempts)
-          generateAndSendMfaCode(activePolicy, value.username)
+        if (data.mfa_required && data.session_id) {
+          setSessionId(data.session_id)
+          setTimeLeft(300) // 5 minutes
           setStep('mfa')
-        } else {
-          setAuthToken(token)
+        } else if (data.access_token) {
+          setAuthToken(data.access_token)
           await queryClient.invalidateQueries({ queryKey: ['auth'] })
           router.navigate({ to: '/', replace: true })
+        } else {
+          setSubmitError('Réponse inattendue du serveur.')
         }
       } catch (error: unknown) {
         const message = getApiErrorMessage(error, 'Identifiants incorrects')
@@ -170,9 +149,14 @@ function RouteComponent() {
     },
   })
 
+  const formatTime = (seconds: number) => {
+    const m = Math.floor(seconds / 60)
+    const s = seconds % 60
+    return `${m}:${String(s).padStart(2, '0')}`
+  }
+
   return (
-    <div className="flex flex-col min-h-screen items-center justify-center bg-black px-4 py-8">
-      {/* Main Login / MFA Container */}
+    <div className="flex min-h-screen items-center justify-center bg-black px-4">
       <div className="w-full max-w-md rounded-xl border border-zinc-800 bg-zinc-900 p-8 shadow-2xl">
         {step === 'credentials' ? (
           <>
@@ -189,7 +173,7 @@ function RouteComponent() {
                 e.stopPropagation()
                 credentialsForm.handleSubmit()
               }}
-              className="space-y-5 [&_input]:border-zinc-700 [&_input]:bg-transparent [&_input]:text-white [&_input]:placeholder:text-zinc-500 [&_input]:focus-visible:border-blue-500 [&_input]:focus-visible:ring-blue-500/30"
+              className="space-y-5"
             >
               <credentialsForm.AppField name="username">
                 {(field) => <field.TextField label="Nom d'utilisateur" />}
@@ -211,7 +195,10 @@ function RouteComponent() {
               )}
 
               <credentialsForm.AppForm>
-                <credentialsForm.SubscribeButton label="Se connecter" className="w-full" />
+                <credentialsForm.SubscribeButton
+                  label="Se connecter"
+                  className="w-full"
+                />
               </credentialsForm.AppForm>
             </form>
           </>
@@ -221,16 +208,16 @@ function RouteComponent() {
               <button
                 type="button"
                 onClick={() => setStep('credentials')}
-                className="inline-flex items-center gap-1.5 text-xs text-zinc-400 hover:text-white mb-4 transition-colors"
+                className="mb-4 inline-flex items-center gap-1.5 text-xs text-zinc-400 transition-colors hover:text-white"
               >
                 <ArrowLeft className="size-3.5" />
                 Retour
               </button>
               <p className="mb-2 text-lg font-semibold text-white">
-                Double Facteur (MFA)
+                Vérification MFA
               </p>
               <p className="text-sm text-zinc-400">
-                Saisissez le code de validation envoyé à votre email
+                Saisissez le code à 6 chiffres envoyé à votre email
               </p>
             </div>
 
@@ -244,111 +231,50 @@ function RouteComponent() {
                   maxLength={6}
                   placeholder="000000"
                   value={mfaCode}
-                  onChange={(e) => setMfaCode(e.target.value.replace(/\D/g, ''))}
-                  className="text-center font-mono text-lg tracking-widest border-zinc-700 bg-transparent text-white placeholder:text-zinc-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/30"
+                  onChange={(e) =>
+                    setMfaCode(e.target.value.replace(/\D/g, ''))
+                  }
+                  className="border-zinc-700 bg-transparent text-center font-mono text-lg tracking-widest text-white placeholder:text-zinc-600 focus-visible:border-blue-500 focus-visible:ring-blue-500/30"
                   autoFocus
                 />
               </div>
 
               <div className="flex items-center justify-between text-xs text-zinc-400">
                 <span>
-                  Temps restant :{' '}
-                  <span className={`font-mono font-semibold ${timeLeft < 15 ? 'text-red-400 animate-pulse' : 'text-blue-400'}`}>
-                    {timeLeft}s
-                  </span>
-                </span>
-                <span>
-                  Tentatives :{' '}
-                  <span className="font-semibold text-zinc-200">
-                    {attemptsLeft} / {policy?.maxAttempts}
+                  Expire dans :{' '}
+                  <span
+                    className={`font-mono font-semibold ${
+                      timeLeft < 30
+                        ? 'animate-pulse text-red-400'
+                        : 'text-blue-400'
+                    }`}
+                  >
+                    {formatTime(timeLeft)}
                   </span>
                 </span>
               </div>
 
               {submitError && (
-                <p className="flex items-start gap-1.5 rounded-lg border border-red-900/40 bg-red-950/40 px-3 py-2 text-sm text-red-200" role="alert">
-                  <AlertCircle className="size-4 shrink-0 mt-0.5" />
+                <p
+                  className="flex items-start gap-1.5 rounded-lg border border-red-900/40 bg-red-950/40 px-3 py-2 text-sm text-red-200"
+                  role="alert"
+                >
+                  <AlertCircle className="mt-0.5 size-4 shrink-0" />
                   <span>{submitError}</span>
                 </p>
               )}
 
-              <div className="flex flex-col gap-3">
-                <Button type="submit" className="w-full">
-                  Vérifier le code
-                </Button>
-
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleResendCode}
-                  disabled={cooldownLeft > 0}
-                  className="w-full border-zinc-800 text-zinc-300 hover:text-white"
-                >
-                  {cooldownLeft > 0 ? (
-                    `Renvoyer le code (${cooldownLeft}s)`
-                  ) : (
-                    <>
-                      <RefreshCw className="mr-1.5 size-3.5" />
-                      Renvoyer le code
-                    </>
-                  )}
-                </Button>
-              </div>
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={isVerifying || timeLeft <= 0}
+              >
+                {isVerifying ? 'Vérification...' : 'Vérifier le code'}
+              </Button>
             </form>
           </>
         )}
       </div>
-
-      {/* Email Inbox Simulator */}
-      {step === 'mfa' && emailSimVisible && (
-        <div className="mt-6 w-full max-w-md rounded-xl border border-blue-900/40 bg-zinc-950 p-5 shadow-2xl animate-in fade-in slide-in-from-bottom-5 duration-300">
-          <div className="flex items-center justify-between border-b border-zinc-850 pb-2 mb-3">
-            <div className="flex items-center gap-2 text-xs font-semibold text-blue-400">
-              <Inbox className="size-4" />
-              <span>Simulateur de Messagerie Interne (SIEM)</span>
-            </div>
-            <button
-              onClick={() => setEmailSimVisible(false)}
-              className="text-zinc-500 hover:text-zinc-300 text-xs"
-            >
-              Masquer
-            </button>
-          </div>
-          <div className="text-xs space-y-2 text-zinc-300">
-            <div>
-              <span className="font-semibold text-zinc-500">De :</span> {policy?.senderEmail}
-            </div>
-            <div>
-              <span className="font-semibold text-zinc-500">À :</span> {usernameState}@siem-corp.local
-            </div>
-            <div>
-              <span className="font-semibold text-zinc-500">Objet :</span> Code de validation de sécurité Smart SIEM
-            </div>
-            <div className="border-t border-zinc-900 pt-2.5 mt-2.5 text-zinc-400 leading-relaxed font-mono bg-zinc-900/50 p-3 rounded border border-zinc-800/40">
-              Bonjour,<br /><br />
-              Une tentative de connexion a été détectée sur la console Smart SIEM.<br />
-              Voici votre code d'authentification multifacteur :<br /><br />
-              <div className="text-center my-3">
-                <span className="text-lg font-bold text-blue-400 bg-blue-950/50 border border-blue-800/60 px-4 py-1.5 rounded tracking-widest select-all">
-                  {generatedCode}
-                </span>
-              </div>
-              Ce code est valide pendant <span className="text-blue-300 font-semibold">{policy?.validitySeconds} secondes</span> et expirera à {expiryTime?.toLocaleTimeString()}.<br /><br />
-              Si vous n'êtes pas à l'origine de cette demande, veuillez contacter votre administrateur SOC immédiatement.
-            </div>
-          </div>
-        </div>
-      )}
-
-      {step === 'mfa' && !emailSimVisible && (
-        <button
-          onClick={() => setEmailSimVisible(true)}
-          className="mt-4 text-xs text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1.5"
-        >
-          <Inbox className="size-3.5" />
-          Afficher le simulateur de messagerie
-        </button>
-      )}
     </div>
   )
 }
