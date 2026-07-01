@@ -12,6 +12,7 @@ import type {
   IncidentStatus,
 } from '#/lib/incidents/api'
 import { useCurrentUser } from '#/lib/auth/hooks'
+import { requireAuth } from '#/lib/auth/guards'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import {
@@ -31,6 +32,7 @@ import {
 } from 'lucide-react'
 
 export const Route = createFileRoute('/incidents')({
+  beforeLoad: requireAuth,
   component: IncidentsPage,
 })
 

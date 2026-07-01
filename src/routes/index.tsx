@@ -2,7 +2,6 @@ import { createFileRoute, Link } from '@tanstack/react-router'
 import { useQuery } from '@tanstack/react-query'
 import { getDashboardStats, listIncidents } from '#/lib/incidents/api'
 import { searchLogs } from '#/lib/logs/api'
-import { useCurrentUser } from '#/lib/auth/hooks'
 import { requireAuth } from '#/lib/auth/guards'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
@@ -15,6 +14,14 @@ import {
   ArrowRight,
   ChevronRight,
 } from 'lucide-react'
+import {
+  SeverityDonutChart,
+  EventEvolutionChart,
+  TopSourcesChart,
+  ThreatTypesChart,
+  LoginFailuresChart,
+  SuspiciousActivityHeatmap,
+} from '#/components/dashboard/SIEMCharts'
 
 export const Route = createFileRoute('/')({
   beforeLoad: requireAuth,
@@ -22,10 +29,6 @@ export const Route = createFileRoute('/')({
 })
 
 function Dashboard() {
-  const { data: user } = useCurrentUser()
-  const role = user?.role ?? 'READER'
-  const canInvestigate = role === 'ANALYST' || role === 'ADMIN'
-
   // Stats
   const { data: stats } = useQuery({
     queryKey: ['dashboard', 'stats'],
@@ -86,6 +89,15 @@ function Dashboard() {
     { name: 'Reporting', status: 'Operational', ok: true },
   ]
 
+  const formatEventTime = (iso: string) => {
+    const date = new Date(iso)
+    if (Number.isNaN(date.getTime())) return '--:--'
+
+    return `${String(date.getUTCHours()).padStart(2, '0')}:${String(
+      date.getUTCMinutes(),
+    ).padStart(2, '0')} UTC`
+  }
+
   return (
     <div className="flex flex-col gap-6 p-4 lg:p-6">
       {/* Page header */}
@@ -118,70 +130,40 @@ function Dashboard() {
         ))}
       </div>
 
+      {/* Row 1: Event Evolution & Severity */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* Priority incident */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
-            {canInvestigate ? 'Priority Incident' : 'Recent Incident'}
-          </p>
-          {hasPriorityIncident ? (
-            <div className="mt-3 flex flex-col gap-3">
-              <SeverityBadge
-                severity={
-                  priorityIncident.severity === 'CRITICAL'
-                    ? 9
-                    : priorityIncident.severity === 'HIGH'
-                      ? 7
-                      : priorityIncident.severity === 'WARNING'
-                        ? 4
-                        : 2
-                }
-              />
-              <h2 className="text-sm font-semibold text-[var(--sea-ink)] leading-snug">
-                {priorityIncident.summary}
-              </h2>
-              <div className="flex flex-col gap-1 text-xs">
-                <div className="flex justify-between">
-                  <span className="text-[var(--sea-ink-soft)]">Rule</span>
-                  <span className="font-medium text-[var(--sea-ink)]">
-                    {priorityIncident.rule.name}
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[var(--sea-ink-soft)]">Confidence</span>
-                  <span className="font-medium text-[var(--sea-ink)]">
-                    {priorityIncident.confidence_score}%
-                  </span>
-                </div>
-                <div className="flex justify-between">
-                  <span className="text-[var(--sea-ink-soft)]">Status</span>
-                  <Badge variant="outline" className="text-[10px]">
-                    {priorityIncident.status}
-                  </Badge>
-                </div>
-                {priorityIncident.related_entities.hosts && (
-                  <div className="flex justify-between">
-                    <span className="text-[var(--sea-ink-soft)]">Affected</span>
-                    <span className="font-medium text-[var(--sea-ink)]">
-                      {priorityIncident.related_entities.hosts.join(', ')}
-                    </span>
-                  </div>
-                )}
-              </div>
-              <Link to="/incidents">
-                <Button size="sm" className="w-full">
-                  {canInvestigate ? 'Investigate Incident' : 'View Incidents'}
-                  <ArrowRight className="size-3.5" />
-                </Button>
-              </Link>
-            </div>
-          ) : (
-            <p className="mt-3 text-xs text-muted-foreground">
-              No critical incidents at this time
-            </p>
-          )}
+        <div className="lg:col-span-2">
+          <EventEvolutionChart />
         </div>
+        <div>
+          <SeverityDonutChart
+            critical={stats?.critical_alerts ?? 0}
+            high={stats?.high_alerts ?? 0}
+            warning={12}
+            info={25}
+          />
+        </div>
+      </div>
 
+      {/* Row 2: Heatmap, Threat Types, Login Failures */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div>
+          <SuspiciousActivityHeatmap />
+        </div>
+        <div>
+          <ThreatTypesChart />
+        </div>
+        <div>
+          <LoginFailuresChart />
+        </div>
+      </div>
+
+      {/* Row 3: Top Sources & Recent Events */}
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+        <div>
+          <TopSourcesChart ips={stats?.top_attackers} />
+        </div>
+        
         {/* Recent logs */}
         <div className="lg:col-span-2 rounded-xl border border-[var(--line)] bg-white dark:bg-zinc-900">
           <div className="flex items-center justify-between border-b border-[var(--line)] px-4 py-3">
@@ -233,7 +215,7 @@ function Dashboard() {
                       className="text-sm text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
                     >
                       <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs text-[var(--sea-ink-soft)]">
-                        {new Date(hit.source.collected_at).toLocaleTimeString()}
+                        {formatEventTime(hit.source.collected_at)}
                       </td>
                       <td className="whitespace-nowrap px-4 py-2.5 text-xs">
                         {hit.source.source_type}
@@ -256,10 +238,73 @@ function Dashboard() {
         </div>
       </div>
 
-      {/* Pipeline + Top Attackers */}
+      {/* Row 4: Priority Incident & SIEM Pipeline */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
-        {/* SIEM Pipeline */}
+        {/* Priority incident */}
         <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+            Priority Incident
+          </p>
+          {hasPriorityIncident ? (
+            <div className="mt-3 flex flex-col gap-3">
+              <SeverityBadge
+                severity={
+                  priorityIncident.severity === 'CRITICAL'
+                    ? 9
+                    : priorityIncident.severity === 'HIGH'
+                      ? 7
+                      : priorityIncident.severity === 'WARNING'
+                        ? 4
+                        : 2
+                }
+              />
+              <h2 className="text-sm font-semibold text-[var(--sea-ink)] leading-snug">
+                {priorityIncident.summary}
+              </h2>
+              <div className="flex flex-col gap-1 text-xs">
+                <div className="flex justify-between">
+                  <span className="text-[var(--sea-ink-soft)]">Rule</span>
+                  <span className="font-medium text-[var(--sea-ink)]">
+                    {priorityIncident.rule.name}
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--sea-ink-soft)]">Confidence</span>
+                  <span className="font-medium text-[var(--sea-ink)]">
+                    {priorityIncident.confidence_score}%
+                  </span>
+                </div>
+                <div className="flex justify-between">
+                  <span className="text-[var(--sea-ink-soft)]">Status</span>
+                  <Badge variant="outline" className="text-[10px]">
+                    {priorityIncident.status}
+                  </Badge>
+                </div>
+                {priorityIncident.related_entities.hosts && (
+                  <div className="flex justify-between">
+                    <span className="text-[var(--sea-ink-soft)]">Affected</span>
+                    <span className="font-medium text-[var(--sea-ink)]">
+                      {priorityIncident.related_entities.hosts.join(', ')}
+                    </span>
+                  </div>
+                )}
+              </div>
+              <Link to="/incidents">
+                <Button size="sm" className="w-full">
+                  View Incidents
+                  <ArrowRight className="size-3.5" />
+                </Button>
+              </Link>
+            </div>
+          ) : (
+            <p className="mt-3 text-xs text-muted-foreground">
+              No critical incidents at this time
+            </p>
+          )}
+        </div>
+
+        {/* SIEM Pipeline */}
+        <div className="lg:col-span-2 rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
           <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
             SIEM Pipeline
           </p>
@@ -296,53 +341,6 @@ function Dashboard() {
               </div>
             ))}
           </div>
-        </div>
-
-        {/* Top Attackers */}
-        <div className="lg:col-span-2 rounded-xl border border-[var(--line)] bg-white dark:bg-zinc-900">
-          <div className="border-b border-[var(--line)] px-4 py-3">
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
-              Top Attackers
-            </p>
-            <p className="text-xs text-[var(--sea-ink-soft)]">
-              Most frequent source IPs by event volume
-            </p>
-          </div>
-          {stats?.top_attackers && stats.top_attackers.length > 0 ? (
-            <div className="overflow-x-auto">
-              <table className="w-full">
-                <thead>
-                  <tr className="border-b border-[var(--line)]">
-                    <th className="whitespace-nowrap px-4 py-2.5 text-left text-xs font-semibold text-[var(--sea-ink-soft)]">
-                      IP Address
-                    </th>
-                    <th className="whitespace-nowrap px-4 py-2.5 text-left text-xs font-semibold text-[var(--sea-ink-soft)]">
-                      Events
-                    </th>
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-[var(--line)]">
-                  {stats.top_attackers.map((ip, i) => (
-                    <tr
-                      key={i}
-                      className="text-sm text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]"
-                    >
-                      <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs">
-                        {ip}
-                      </td>
-                      <td className="whitespace-nowrap px-4 py-2.5 text-xs">
-                        —
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          ) : (
-            <div className="px-4 py-8 text-center text-xs text-muted-foreground">
-              No top attacker data available
-            </div>
-          )}
         </div>
       </div>
     </div>

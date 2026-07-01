@@ -9,6 +9,8 @@ import { getApiErrorMessage } from '#/lib/api/errors'
 import { Badge } from '#/components/ui/badge'
 import { Button } from '#/components/ui/button'
 import { Input } from '#/components/ui/input'
+import { Switch } from '#/components/ui/switch'
+import { getMfaPolicy, setMfaPolicy, type MfaPolicy } from '#/lib/auth/mfa'
 import { env } from '#/env'
 import {
   Settings as SettingsIcon,
@@ -48,6 +50,51 @@ function SettingsPage() {
   const [profilePasswordConfirm, setProfilePasswordConfirm] = useState('')
   const [profileSuccess, setProfileSuccess] = useState('')
   const [profileError, setProfileError] = useState('')
+
+  // MFA Policy States
+  const [mfaEnabled, setMfaEnabled] = useState(() => getMfaPolicy().enabled)
+  const [mfaValidity, setMfaValidity] = useState(() => getMfaPolicy().validitySeconds)
+  const [mfaAttempts, setMfaAttempts] = useState(() => getMfaPolicy().maxAttempts)
+  const [mfaCooldown, setMfaCooldown] = useState(() => getMfaPolicy().resendCooldownSeconds)
+  const [mfaSender, setMfaSender] = useState(() => getMfaPolicy().senderEmail)
+  const [mfaSuccess, setMfaSuccess] = useState('')
+  const [mfaError, setMfaError] = useState('')
+
+  const handleMfaSubmit = (event: FormEvent<HTMLFormElement>) => {
+    event.preventDefault()
+    setMfaSuccess('')
+    setMfaError('')
+
+    if (mfaValidity <= 5) {
+      setMfaError('Le code doit être valide au moins 5 secondes.')
+      return
+    }
+    if (mfaAttempts <= 0) {
+      setMfaError('Le nombre maximum de tentatives doit être supérieur à 0.')
+      return
+    }
+    if (mfaCooldown < 0) {
+      setMfaError('Le délai de renvoi ne peut pas être négatif.')
+      return
+    }
+    if (!mfaSender.trim() || !mfaSender.includes('@')) {
+      setMfaError("L'adresse email de l'expéditeur doit être valide.")
+      return
+    }
+
+    try {
+      setMfaPolicy({
+        enabled: mfaEnabled,
+        validitySeconds: mfaValidity,
+        maxAttempts: mfaAttempts,
+        resendCooldownSeconds: mfaCooldown,
+        senderEmail: mfaSender.trim(),
+      })
+      setMfaSuccess('Politique MFA mise à jour avec succès.')
+    } catch {
+      setMfaError('Impossible de sauvegarder la politique MFA.')
+    }
+  }
 
   const updateProfileMutation = useMutation({
     mutationFn: updateCurrentUser,
@@ -325,6 +372,108 @@ function SettingsPage() {
           ) : (
             <p className="text-xs text-muted-foreground">Déconnecté</p>
           )}
+        </div>
+
+        {/* Politique MFA & Email */}
+        <div className="md:col-span-2 rounded-xl border border-[var(--line)] bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
+          <div>
+            <h2 className="text-sm font-semibold text-[var(--sea-ink)]">
+              Politique MFA & Email
+            </h2>
+            <p className="text-xs text-[var(--sea-ink-soft)]">
+              Déterminez les règles de l'authentification multifacteur et de l'envoi de codes par email.
+            </p>
+          </div>
+
+          <form onSubmit={handleMfaSubmit} className="flex flex-col gap-4">
+            <div className="flex items-center justify-between rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3">
+              <div className="flex flex-col gap-0.5">
+                <span className="text-xs font-semibold text-[var(--sea-ink)]">
+                  Activer le MFA obligatoire
+                </span>
+                <span className="text-[10px] text-[var(--sea-ink-soft)]">
+                  Exige une vérification de code par email après la saisie des identifiants.
+                </span>
+              </div>
+              <Switch
+                checked={mfaEnabled}
+                onCheckedChange={setMfaEnabled}
+              />
+            </div>
+
+            {mfaEnabled && (
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 border-t border-[var(--line)] pt-4">
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    Validité du code (secondes)
+                  </label>
+                  <Input
+                    type="number"
+                    value={mfaValidity}
+                    onChange={(e) => setMfaValidity(parseInt(e.target.value) || 0)}
+                    min={5}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    Nombre maximum de tentatives
+                  </label>
+                  <Input
+                    type="number"
+                    value={mfaAttempts}
+                    onChange={(e) => setMfaAttempts(parseInt(e.target.value) || 0)}
+                    min={1}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    Délai de renvoi / Cooldown (secondes)
+                  </label>
+                  <Input
+                    type="number"
+                    value={mfaCooldown}
+                    onChange={(e) => setMfaCooldown(parseInt(e.target.value) || 0)}
+                    min={0}
+                  />
+                </div>
+
+                <div className="flex flex-col gap-1.5">
+                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    Expéditeur de l'email
+                  </label>
+                  <Input
+                    type="text"
+                    value={mfaSender}
+                    onChange={(e) => setMfaSender(e.target.value)}
+                    placeholder="security-alerts@siem-corp.local"
+                  />
+                </div>
+              </div>
+            )}
+
+            <div className="flex items-center justify-between border-t border-[var(--line)] pt-3">
+              <div className="flex-1">
+                {mfaError && (
+                  <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
+                    <AlertCircle className="size-3.5" />
+                    {mfaError}
+                  </p>
+                )}
+                {mfaSuccess && (
+                  <p className="flex items-center gap-1.5 text-xs text-green-600 dark:text-green-400">
+                    <CheckCircle2 className="size-3.5" />
+                    {mfaSuccess}
+                  </p>
+                )}
+              </div>
+              <Button type="submit" size="sm">
+                <Save className="size-3.5" />
+                Enregistrer la politique
+              </Button>
+            </div>
+          </form>
         </div>
 
         {/* API Connection Info */}
