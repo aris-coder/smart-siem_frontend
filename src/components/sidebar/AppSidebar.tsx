@@ -12,21 +12,21 @@ export default function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
   return (
     <aside
       className={cn(
-        'fixed left-0 top-0 z-40 flex h-dvh flex-col border-r border-[var(--line)] bg-[var(--bg-base)] transition-all duration-200 ease-in-out',
+        'fixed left-0 top-0 z-40 flex h-dvh flex-col border-r border-(--line) bg-(--bg-base) transition-all duration-200 ease-in-out',
         collapsed ? 'w-16' : 'w-60',
       )}
     >
       {/* Brand */}
       <div
         className={cn(
-          'flex w-full items-center border-b border-[var(--line)] px-3 py-4',
+          'flex w-full items-center border-b border-(--line) px-3 py-4',
           collapsed ? 'justify-center' : 'gap-3 px-4',
         )}
       >
         <button
           type="button"
           onClick={onToggle}
-          className="flex shrink-0 items-center justify-center rounded-lg bg-[var(--lagoon)] text-white size-8"
+          className="flex shrink-0 items-center justify-center rounded-lg bg-(--lagoon) text-white size-8"
         >
           <ShieldAlert className="size-5" />
         </button>
@@ -34,7 +34,7 @@ export default function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
         {!collapsed && (
           <span
             onClick={onToggle}
-            className="flex-1 cursor-pointer text-sm font-semibold tracking-tight text-[var(--sea-ink)]"
+            className="flex-1 cursor-pointer text-sm font-semibold tracking-tight text-(--sea-ink)"
           >
             Smart SIEM
           </span>
@@ -45,7 +45,7 @@ export default function AppSidebar({ collapsed, onToggle }: AppSidebarProps) {
             type="button"
             onClick={onToggle}
             className={cn(
-              'flex cursor-pointer items-center justify-center rounded-md p-1.5 text-[var(--sea-ink-soft)] transition-colors hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]',
+              'flex cursor-pointer items-center justify-center rounded-md p-1.5 text-(--sea-ink-soft) transition-colors hover:bg-(--link-bg-hover) hover:text-(--sea-ink)',
             )}
             aria-label="Collapse sidebar"
           >

@@ -84,7 +84,7 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
     <div className="flex flex-col gap-6">
       {/* Header with severity */}
       <div className="flex items-center gap-3">
-        <h2 className="text-xl font-semibold text-[var(--sea-ink)]">
+        <h2 className="text-xl font-semibold text-(--sea-ink)">
           Log Details
         </h2>
         <SeverityBadge severity={source.severity} />
@@ -94,10 +94,10 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
       <div className="grid grid-cols-1 gap-x-6 gap-y-4 sm:grid-cols-2">
         {detailFields.map((field) => (
           <div key={field.label}>
-            <dt className="text-xs font-medium text-[var(--sea-ink-soft)] uppercase tracking-wider">
+            <dt className="text-xs font-medium text-(--sea-ink-soft) uppercase tracking-wider">
               {field.label}
             </dt>
-            <dd className="mt-1 whitespace-nowrap text-sm text-[var(--sea-ink)]">
+            <dd className="mt-1 whitespace-nowrap text-sm text-(--sea-ink)">
               {field.label === 'Severity' ? (
                 <SeverityBadge severity={field.value as number} />
               ) : field.label === 'IP Address' && onPivotIp ? (
@@ -124,7 +124,7 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
 
       {/* Timeline */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold text-[var(--sea-ink-soft)] uppercase tracking-wider">
+        <h3 className="mb-2 text-xs font-semibold text-(--sea-ink-soft) uppercase tracking-wider">
           Timeline
         </h3>
         <div className="flex flex-col gap-2 sm:flex-row sm:gap-6">
@@ -132,7 +132,7 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
             <span className="whitespace-nowrap text-xs text-muted-foreground">
               Collected
             </span>
-            <span className="whitespace-nowrap font-mono text-sm text-[var(--sea-ink)]">
+            <span className="whitespace-nowrap font-mono text-sm text-(--sea-ink)">
               {formatISODate(source.collected_at)}
             </span>
           </div>
@@ -140,7 +140,7 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
             <span className="whitespace-nowrap text-xs text-muted-foreground">
               Normalized
             </span>
-            <span className="whitespace-nowrap font-mono text-sm text-[var(--sea-ink)]">
+            <span className="whitespace-nowrap font-mono text-sm text-(--sea-ink)">
               {formatISODate(source.normalized_at)}
             </span>
           </div>
@@ -150,7 +150,7 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
       {/* Score */}
       {log.score !== null && (
         <div>
-          <h3 className="mb-2 text-xs font-semibold text-[var(--sea-ink-soft)] uppercase tracking-wider">
+          <h3 className="mb-2 text-xs font-semibold text-(--sea-ink-soft) uppercase tracking-wider">
             Score
           </h3>
           <Badge variant="outline" className="text-sm font-semibold">
@@ -188,10 +188,10 @@ export function LogDetails({ log, onPivotIp }: LogDetailsProps) {
 
       {/* Raw JSON */}
       <div>
-        <h3 className="mb-2 text-xs font-semibold text-[var(--sea-ink-soft)] uppercase tracking-wider">
+        <h3 className="mb-2 text-xs font-semibold text-(--sea-ink-soft) uppercase tracking-wider">
           Raw Event
         </h3>
-        <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-[var(--line)] bg-[var(--surface)] p-4 font-mono text-xs leading-relaxed text-[var(--sea-ink)]">
+        <pre className="max-h-96 overflow-auto whitespace-pre-wrap rounded-lg border border-(--line) bg-(--surface) p-4 font-mono text-xs leading-relaxed text-(--sea-ink)">
           {JSON.stringify(log, null, 2)}
         </pre>
       </div>

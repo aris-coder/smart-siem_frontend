@@ -293,7 +293,7 @@ export function LogTable({
   if (isLoading) {
     return (
       <div className="island-shell rounded-xl overflow-hidden">
-        <div className="divide-y divide-[var(--line)]">
+        <div className="divide-y divide-(--line)">
           {Array.from({ length: 8 }).map((_, i) => (
             <div
               key={i}
@@ -354,12 +354,12 @@ export function LogTable({
             {table.getHeaderGroups().map((headerGroup) => (
               <tr
                 key={headerGroup.id}
-                className="border-b border-[var(--line)]"
+                className="border-b border-(--line)"
               >
                 {headerGroup.headers.map((header) => (
                   <th
                     key={header.id}
-                    className="px-4 py-2.5 text-left text-xs font-semibold text-[var(--sea-ink-soft)]"
+                    className="px-4 py-2.5 text-left text-xs font-semibold text-(--sea-ink-soft)"
                   >
                     {header.isPlaceholder
                       ? null
@@ -372,7 +372,7 @@ export function LogTable({
               </tr>
             ))}
           </thead>
-          <tbody className="divide-y divide-[var(--line)]">
+          <tbody className="divide-y divide-(--line)">
             {table.getRowModel().rows.map((row) => (
               <tr
                 key={row.id}
@@ -395,7 +395,7 @@ export function LogTable({
       </div>
 
       {/* Pagination */}
-      <div className="flex items-center justify-between border-t border-[var(--line)] px-4 py-3">
+      <div className="flex items-center justify-between border-t border-(--line) px-4 py-3">
         <p className="text-xs text-muted-foreground">
           {total === 1 ? '1 result' : `${total.toLocaleString()} results`}
         </p>
@@ -438,7 +438,7 @@ function SortHeader({
     <button
       type="button"
       onClick={onToggle}
-      className="inline-flex items-center gap-1 text-xs font-semibold text-[var(--sea-ink-soft)] hover:text-foreground"
+      className="inline-flex items-center gap-1 text-xs font-semibold text-(--sea-ink-soft) hover:text-foreground"
     >
       {label}
       {isSorted === 'asc' && <ArrowUp className="size-3" />}

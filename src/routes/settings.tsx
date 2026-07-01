@@ -197,14 +197,14 @@ function SettingsPage() {
     <div className="flex flex-col gap-6 p-4 lg:p-6 max-w-4xl">
       {/* Header */}
       <div className="flex items-center gap-3">
-        <div className="flex size-10 items-center justify-center rounded-xl border border-[var(--line)] bg-[var(--surface)] text-[var(--sea-ink)]">
+        <div className="flex size-10 items-center justify-center rounded-xl border border-(--line) bg-(--surface) text-(--sea-ink)">
           <SettingsIcon className="size-5" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-[var(--sea-ink)]">
+          <h1 className="text-lg font-semibold text-(--sea-ink)">
             Paramètres
           </h1>
-          <p className="text-xs text-[var(--sea-ink-soft)]">
+          <p className="text-xs text-(--sea-ink-soft)">
             Configurez vos préférences d'application et gérez votre session.
           </p>
         </div>
@@ -212,12 +212,12 @@ function SettingsPage() {
 
       <div className="grid grid-cols-1 gap-6 md:grid-cols-2">
         {/* Theme Settings */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
+        <div className="rounded-xl border border-(--line) bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-[var(--sea-ink)]">
+            <h2 className="text-sm font-semibold text-(--sea-ink)">
               Apparence & Thème
             </h2>
-            <p className="text-xs text-[var(--sea-ink-soft)]">
+            <p className="text-xs text-(--sea-ink-soft)">
               Personnalisez l'affichage de la console Smart SIEM.
             </p>
           </div>
@@ -246,8 +246,8 @@ function SettingsPage() {
                 onClick={() => setTheme(opt.mode as ThemeMode)}
                 className={`flex flex-col items-center gap-2 rounded-lg border p-3 text-xs font-medium transition-all ${
                   theme === opt.mode
-                    ? 'border-[var(--sea-ink)] bg-[var(--link-bg-hover)] text-[var(--sea-ink)]'
-                    : 'border-[var(--line)] text-[var(--sea-ink-soft)] hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]'
+                    ? 'border-(--sea-ink) bg-(--link-bg-hover) text-(--sea-ink)'
+                    : 'border-(--line) text-(--sea-ink-soft) hover:bg-(--link-bg-hover) hover:text-(--sea-ink)'
                 }`}
               >
                 {opt.icon}
@@ -258,12 +258,12 @@ function SettingsPage() {
         </div>
 
         {/* User Profile Info */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
+        <div className="rounded-xl border border-(--line) bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-[var(--sea-ink)]">
+            <h2 className="text-sm font-semibold text-(--sea-ink)">
               Profil Utilisateur
             </h2>
-            <p className="text-xs text-[var(--sea-ink-soft)]">
+            <p className="text-xs text-(--sea-ink-soft)">
               Détails de votre compte actuel.
             </p>
           </div>
@@ -273,21 +273,21 @@ function SettingsPage() {
           ) : user ? (
             <div className="flex flex-col gap-3">
               <div className="flex items-center gap-3">
-                <div className="flex size-10 items-center justify-center rounded-full bg-[var(--lagoon)]/10 text-[var(--lagoon-deep)]">
+                <div className="flex size-10 items-center justify-center rounded-full bg-(--lagoon)/10 text-(--lagoon-deep)">
                   <UserIcon className="size-5" />
                 </div>
                 <div>
-                  <p className="text-sm font-semibold text-[var(--sea-ink)]">
+                  <p className="text-sm font-semibold text-(--sea-ink)">
                     {user.username}
                   </p>
-                  <p className="text-xs text-[var(--sea-ink-soft)]">
+                  <p className="text-xs text-(--sea-ink-soft)">
                     ID: {user.id.slice(0, 8)}...
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-center justify-between border-t border-[var(--line)] pt-3 text-xs">
-                <span className="text-[var(--sea-ink-soft)]">
+              <div className="flex items-center justify-between border-t border-(--line) pt-3 text-xs">
+                <span className="text-(--sea-ink-soft)">
                   Rôle de sécurité
                 </span>
                 <Badge className={roleColors[user.role]} variant="outline">
@@ -297,11 +297,11 @@ function SettingsPage() {
               </div>
 
               <form
-                className="flex flex-col gap-3 border-t border-[var(--line)] pt-4"
+                className="flex flex-col gap-3 border-t border-(--line) pt-4"
                 onSubmit={handleProfileSubmit}
               >
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                  <label className="text-xs font-medium text-(--sea-ink-soft)">
                     Nom d'utilisateur
                   </label>
                   <Input
@@ -314,7 +314,7 @@ function SettingsPage() {
 
                 <div className="grid grid-cols-1 gap-3 sm:grid-cols-2">
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    <label className="text-xs font-medium text-(--sea-ink-soft)">
                       Nouveau mot de passe
                     </label>
                     <Input
@@ -328,7 +328,7 @@ function SettingsPage() {
                     />
                   </div>
                   <div className="flex flex-col gap-1.5">
-                    <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                    <label className="text-xs font-medium text-(--sea-ink-soft)">
                       Confirmation
                     </label>
                     <Input
@@ -375,23 +375,23 @@ function SettingsPage() {
         </div>
 
         {/* Politique MFA & Email */}
-        <div className="md:col-span-2 rounded-xl border border-[var(--line)] bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
+        <div className="md:col-span-2 rounded-xl border border-(--line) bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-[var(--sea-ink)]">
+            <h2 className="text-sm font-semibold text-(--sea-ink)">
               Politique MFA & Email
             </h2>
-            <p className="text-xs text-[var(--sea-ink-soft)]">
+            <p className="text-xs text-(--sea-ink-soft)">
               Déterminez les règles de l'authentification multifacteur et de l'envoi de codes par email.
             </p>
           </div>
 
           <form onSubmit={handleMfaSubmit} className="flex flex-col gap-4">
-            <div className="flex items-center justify-between rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3">
+            <div className="flex items-center justify-between rounded-lg border border-(--line) bg-(--surface) p-3">
               <div className="flex flex-col gap-0.5">
-                <span className="text-xs font-semibold text-[var(--sea-ink)]">
+                <span className="text-xs font-semibold text-(--sea-ink)">
                   Activer le MFA obligatoire
                 </span>
-                <span className="text-[10px] text-[var(--sea-ink-soft)]">
+                <span className="text-[10px] text-(--sea-ink-soft)">
                   Exige une vérification de code par email après la saisie des identifiants.
                 </span>
               </div>
@@ -402,9 +402,9 @@ function SettingsPage() {
             </div>
 
             {mfaEnabled && (
-              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 border-t border-[var(--line)] pt-4">
+              <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-4 border-t border-(--line) pt-4">
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                  <label className="text-xs font-medium text-(--sea-ink-soft)">
                     Validité du code (secondes)
                   </label>
                   <Input
@@ -416,7 +416,7 @@ function SettingsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                  <label className="text-xs font-medium text-(--sea-ink-soft)">
                     Nombre maximum de tentatives
                   </label>
                   <Input
@@ -428,7 +428,7 @@ function SettingsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                  <label className="text-xs font-medium text-(--sea-ink-soft)">
                     Délai de renvoi / Cooldown (secondes)
                   </label>
                   <Input
@@ -440,7 +440,7 @@ function SettingsPage() {
                 </div>
 
                 <div className="flex flex-col gap-1.5">
-                  <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+                  <label className="text-xs font-medium text-(--sea-ink-soft)">
                     Expéditeur de l'email
                   </label>
                   <Input
@@ -453,7 +453,7 @@ function SettingsPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between border-t border-[var(--line)] pt-3">
+            <div className="flex items-center justify-between border-t border-(--line) pt-3">
               <div className="flex-1">
                 {mfaError && (
                   <p className="flex items-center gap-1.5 text-xs text-red-600 dark:text-red-400">
@@ -477,36 +477,36 @@ function SettingsPage() {
         </div>
 
         {/* API Connection Info */}
-        <div className="md:col-span-2 rounded-xl border border-[var(--line)] bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
+        <div className="md:col-span-2 rounded-xl border border-(--line) bg-white p-5 dark:bg-zinc-900 flex flex-col gap-4">
           <div>
-            <h2 className="text-sm font-semibold text-[var(--sea-ink)]">
+            <h2 className="text-sm font-semibold text-(--sea-ink)">
               Configuration de Connexion API
             </h2>
-            <p className="text-xs text-[var(--sea-ink-soft)]">
+            <p className="text-xs text-(--sea-ink-soft)">
               Points de terminaison configurés pour les flux de données.
             </p>
           </div>
 
           <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 text-xs">
-            <div className="flex items-start gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3">
-              <Globe className="size-4 text-[var(--sea-ink-soft)] shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2.5 rounded-lg border border-(--line) bg-(--surface) p-3">
+              <Globe className="size-4 text-(--sea-ink-soft) shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <p className="font-semibold text-[var(--sea-ink)]">
+                <p className="font-semibold text-(--sea-ink)">
                   API REST Endpoint
                 </p>
-                <p className="mt-0.5 font-mono text-[10px] text-[var(--sea-ink-soft)] truncate">
+                <p className="mt-0.5 font-mono text-[10px] text-(--sea-ink-soft) truncate">
                   {env.VITE_API_URL || 'http://localhost:3000'}
                 </p>
               </div>
             </div>
 
-            <div className="flex items-start gap-2.5 rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3">
-              <Database className="size-4 text-[var(--sea-ink-soft)] shrink-0 mt-0.5" />
+            <div className="flex items-start gap-2.5 rounded-lg border border-(--line) bg-(--surface) p-3">
+              <Database className="size-4 text-(--sea-ink-soft) shrink-0 mt-0.5" />
               <div className="min-w-0">
-                <p className="font-semibold text-[var(--sea-ink)]">
+                <p className="font-semibold text-(--sea-ink)">
                   Websocket Server
                 </p>
-                <p className="mt-0.5 font-mono text-[10px] text-[var(--sea-ink-soft)] truncate">
+                <p className="mt-0.5 font-mono text-[10px] text-(--sea-ink-soft) truncate">
                   {env.VITE_WS_URL || 'http://localhost:3000'}
                 </p>
               </div>

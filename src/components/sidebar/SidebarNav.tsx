@@ -89,8 +89,8 @@ export default function SidebarNav({ collapsed }: SidebarNavProps) {
             className={cn(
               'flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors no-underline',
               isActive
-                ? 'bg-[var(--lagoon)]/10 text-[var(--lagoon-deep)]'
-                : 'text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]',
+                ? 'bg-(--lagoon)/10 text-(--lagoon-deep)'
+                : 'text-(--sea-ink) hover:bg-(--link-bg-hover) hover:text-(--sea-ink)',
               collapsed && 'justify-center px-0',
             )}
           >

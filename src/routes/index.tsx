@@ -74,8 +74,8 @@ function Dashboard() {
     {
       label: 'Open Incidents',
       value: stats?.open_incidents ?? '—',
-      icon: <Activity className="size-5 text-[var(--sea-ink)]" />,
-      tone: 'text-[var(--sea-ink)]',
+      icon: <Activity className="size-5 text-(--sea-ink)" />,
+      tone: 'text-(--sea-ink)',
     },
     {
       label: 'System Status',
@@ -98,10 +98,10 @@ function Dashboard() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[var(--sea-ink)]">
+          <h1 className="text-lg font-semibold text-(--sea-ink)">
             Dashboard
           </h1>
-          <p className="text-xs text-[var(--sea-ink-soft)]">
+          <p className="text-xs text-(--sea-ink-soft)">
             Real-time security operations overview
             {overview?.generated_at && (
               <span className="ml-2">
@@ -117,10 +117,10 @@ function Dashboard() {
         {statCards.map((stat) => (
           <div
             key={stat.label}
-            className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900"
+            className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900"
           >
             <div className="flex items-center justify-between">
-              <p className="text-xs text-[var(--sea-ink-soft)]">{stat.label}</p>
+              <p className="text-xs text-(--sea-ink-soft)">{stat.label}</p>
               {stat.icon}
             </div>
             <p className={`mt-2 text-2xl font-semibold ${stat.tone}`}>
@@ -132,8 +132,8 @@ function Dashboard() {
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Severity distribution */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
             Severity Distribution
           </p>
           <div className="mt-3 flex flex-col gap-2">
@@ -152,7 +152,7 @@ function Dashboard() {
                   )
                   return (
                     <div key={severity} className="flex items-center gap-3">
-                      <span className="w-16 text-xs font-medium text-[var(--sea-ink)]">
+                      <span className="w-16 text-xs font-medium text-(--sea-ink)">
                         {severity}
                       </span>
                       <div className="flex-1 h-2 rounded-full bg-gray-100 dark:bg-zinc-700">
@@ -163,7 +163,7 @@ function Dashboard() {
                           }}
                         />
                       </div>
-                      <span className="w-6 text-right text-xs font-semibold text-[var(--sea-ink)]">
+                      <span className="w-6 text-right text-xs font-semibold text-(--sea-ink)">
                         {count}
                       </span>
                     </div>
@@ -179,11 +179,11 @@ function Dashboard() {
         </div>
 
         {/* Events timeline (mini chart as bars) */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
             Events Timeline
           </p>
-          <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+          <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
             Last {overview?.interval ?? '24h'}
           </p>
           <div className="mt-3 flex items-end gap-0.5 h-24">
@@ -198,7 +198,7 @@ function Dashboard() {
                 return (
                   <div key={i} className="group relative flex-1">
                     <div
-                      className="w-full rounded-t bg-[var(--lagoon)] opacity-80 transition-opacity hover:opacity-100"
+                      className="w-full rounded-t bg-(--lagoon) opacity-80 transition-opacity hover:opacity-100"
                       style={{ height: `${Math.max(heightPct, 2)}%` }}
                       title={`${bucket.label}: ${bucket.count} events`}
                     />
@@ -212,7 +212,7 @@ function Dashboard() {
             )}
           </div>
           {overview?.events_timeline && overview.events_timeline.length > 0 && (
-            <div className="mt-1 flex justify-between text-[10px] text-[var(--sea-ink-soft)]">
+            <div className="mt-1 flex justify-between text-[10px] text-(--sea-ink-soft)">
               <span>{overview.events_timeline[0]?.label}</span>
               <span>
                 {
@@ -225,8 +225,8 @@ function Dashboard() {
         </div>
 
         {/* Priority incident */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
             {canInvestigate ? 'Priority Incident' : 'Recent Incident'}
           </p>
           {hasPriorityIncident ? (
@@ -242,32 +242,32 @@ function Dashboard() {
                         : 2
                 }
               />
-              <h2 className="text-sm font-semibold text-[var(--sea-ink)] leading-snug">
+              <h2 className="text-sm font-semibold text-(--sea-ink) leading-snug">
                 {priorityIncident.summary}
               </h2>
               <div className="flex flex-col gap-1 text-xs">
                 <div className="flex justify-between">
-                  <span className="text-[var(--sea-ink-soft)]">Rule</span>
-                  <span className="font-medium text-[var(--sea-ink)]">
+                  <span className="text-(--sea-ink-soft)">Rule</span>
+                  <span className="font-medium text-(--sea-ink)">
                     {priorityIncident.rule.name}
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--sea-ink-soft)]">Confidence</span>
-                  <span className="font-medium text-[var(--sea-ink)]">
+                  <span className="text-(--sea-ink-soft)">Confidence</span>
+                  <span className="font-medium text-(--sea-ink)">
                     {priorityIncident.confidence_score}%
                   </span>
                 </div>
                 <div className="flex justify-between">
-                  <span className="text-[var(--sea-ink-soft)]">Status</span>
+                  <span className="text-(--sea-ink-soft)">Status</span>
                   <Badge variant="outline" className="text-[10px]">
                     {priorityIncident.status}
                   </Badge>
                 </div>
                 {priorityIncident.related_entities.hosts && (
                   <div className="flex justify-between">
-                    <span className="text-[var(--sea-ink-soft)]">Affected</span>
-                    <span className="font-medium text-[var(--sea-ink)]">
+                    <span className="text-(--sea-ink-soft)">Affected</span>
+                    <span className="font-medium text-(--sea-ink)">
                       {priorityIncident.related_entities.hosts.join(', ')}
                     </span>
                   </div>
@@ -291,10 +291,10 @@ function Dashboard() {
       {/* Top sources + Threat types + Login failures */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Top sources */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
           <div className="flex items-center gap-2">
-            <Globe className="size-4 text-[var(--sea-ink-soft)]" />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+            <Globe className="size-4 text-(--sea-ink-soft)" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
               Top Source IPs
             </p>
           </div>
@@ -303,18 +303,18 @@ function Dashboard() {
               {overview.top_sources.map((src, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between rounded-lg border border-[var(--line)] px-3 py-2"
+                  className="flex items-center justify-between rounded-lg border border-(--line) px-3 py-2"
                 >
                   <div className="flex items-center gap-2 min-w-0">
-                    <span className="text-xs font-mono text-[var(--sea-ink)] truncate">
+                    <span className="text-xs font-mono text-(--sea-ink) truncate">
                       {src.source_ip}
                     </span>
                   </div>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-semibold text-[var(--sea-ink)]">
+                    <span className="text-xs font-semibold text-(--sea-ink)">
                       {src.count}
                     </span>
-                    <span className="text-[10px] text-[var(--sea-ink-soft)]">
+                    <span className="text-[10px] text-(--sea-ink-soft)">
                       {src.percentage}%
                     </span>
                   </div>
@@ -329,10 +329,10 @@ function Dashboard() {
         </div>
 
         {/* Threat types */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
           <div className="flex items-center gap-2">
-            <AlertCircle className="size-4 text-[var(--sea-ink-soft)]" />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+            <AlertCircle className="size-4 text-(--sea-ink-soft)" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
               Threat Types
             </p>
           </div>
@@ -341,16 +341,16 @@ function Dashboard() {
               {overview.threat_types.map((t, i) => (
                 <div
                   key={i}
-                  className="flex items-center justify-between rounded-lg border border-[var(--line)] px-3 py-2"
+                  className="flex items-center justify-between rounded-lg border border-(--line) px-3 py-2"
                 >
-                  <span className="text-xs text-[var(--sea-ink)] truncate">
+                  <span className="text-xs text-(--sea-ink) truncate">
                     {t.type}
                   </span>
                   <div className="flex items-center gap-2 shrink-0">
-                    <span className="text-xs font-semibold text-[var(--sea-ink)]">
+                    <span className="text-xs font-semibold text-(--sea-ink)">
                       {t.count}
                     </span>
-                    <span className="text-[10px] text-[var(--sea-ink-soft)]">
+                    <span className="text-[10px] text-(--sea-ink-soft)">
                       {t.percentage}%
                     </span>
                   </div>
@@ -365,10 +365,10 @@ function Dashboard() {
         </div>
 
         {/* Login failures */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
           <div className="flex items-center gap-2">
-            <Users className="size-4 text-[var(--sea-ink-soft)]" />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+            <Users className="size-4 text-(--sea-ink-soft)" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
               Login Failures
             </p>
           </div>
@@ -377,13 +377,13 @@ function Dashboard() {
               {overview.login_failures.map((f, i) => (
                 <div
                   key={i}
-                  className="rounded-lg border border-[var(--line)] px-3 py-2"
+                  className="rounded-lg border border-(--line) px-3 py-2"
                 >
                   <div className="flex items-center justify-between">
-                    <span className="text-xs font-medium text-[var(--sea-ink)]">
+                    <span className="text-xs font-medium text-(--sea-ink)">
                       {f.label}
                     </span>
-                    <span className="text-xs font-semibold text-[var(--sea-ink)]">
+                    <span className="text-xs font-semibold text-(--sea-ink)">
                       {f.count}
                     </span>
                   </div>
@@ -396,7 +396,7 @@ function Dashboard() {
                     >
                       {f.threat_level}
                     </Badge>
-                    <span className="text-[10px] text-[var(--sea-ink-soft)] truncate">
+                    <span className="text-[10px] text-(--sea-ink-soft) truncate">
                       {f.description}
                     </span>
                   </div>
@@ -414,14 +414,14 @@ function Dashboard() {
       {/* Heatmap + Pipeline */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* Suspicious activity heatmap */}
-        <div className="lg:col-span-2 rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
+        <div className="lg:col-span-2 rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
           <div className="flex items-center gap-2">
-            <Activity className="size-4 text-[var(--sea-ink-soft)]" />
-            <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+            <Activity className="size-4 text-(--sea-ink-soft)" />
+            <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
               Suspicious Activity Heatmap
             </p>
           </div>
-          <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+          <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
             High-severity events by day and hour block
           </p>
           {overview?.suspicious_activity_heatmap &&
@@ -432,7 +432,7 @@ function Dashboard() {
                 {['MON', 'TUE', 'WED', 'THU', 'FRI', 'SAT', 'SUN'].map((d) => (
                   <div
                     key={d}
-                    className="text-center text-[10px] font-medium text-[var(--sea-ink-soft)]"
+                    className="text-center text-[10px] font-medium text-(--sea-ink-soft)"
                   >
                     {d}
                   </div>
@@ -449,7 +449,7 @@ function Dashboard() {
                   return [
                     <div
                       key={`label-${block}`}
-                      className="text-[10px] text-[var(--sea-ink-soft)] self-center"
+                      className="text-[10px] text-(--sea-ink-soft) self-center"
                     >
                       {block}
                     </div>,
@@ -486,27 +486,27 @@ function Dashboard() {
         </div>
 
         {/* SIEM Pipeline */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
-          <p className="text-[10px] font-semibold uppercase tracking-wider text-[var(--sea-ink-soft)]">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
+          <p className="text-[10px] font-semibold uppercase tracking-wider text-(--sea-ink-soft)">
             SIEM Pipeline
           </p>
-          <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+          <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
             Processing stages status
           </p>
           <div className="mt-3 flex flex-col gap-2">
             {pipelineSteps.map((step, i) => (
               <div
                 key={step.name}
-                className="flex items-center gap-3 rounded-lg border border-[var(--line)] bg-[var(--surface)] px-3 py-2.5"
+                className="flex items-center gap-3 rounded-lg border border-(--line) bg-(--surface) px-3 py-2.5"
               >
-                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-[var(--line)] text-[10px] font-semibold text-[var(--sea-ink-soft)]">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-(--line) text-[10px] font-semibold text-(--sea-ink-soft)">
                   {i + 1}
                 </span>
                 <div className="flex-1 min-w-0">
-                  <p className="text-xs font-medium text-[var(--sea-ink)]">
+                  <p className="text-xs font-medium text-(--sea-ink)">
                     {step.name}
                   </p>
-                  <p className="text-[10px] text-[var(--sea-ink-soft)]">
+                  <p className="text-[10px] text-(--sea-ink-soft)">
                     {step.status}
                   </p>
                 </div>

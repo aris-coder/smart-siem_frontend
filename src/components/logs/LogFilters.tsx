@@ -111,14 +111,14 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
   return (
     <div className="island-shell rounded-xl p-4">
-      <h3 className="mb-3 text-sm font-semibold text-[var(--sea-ink)]">
+      <h3 className="mb-3 text-sm font-semibold text-(--sea-ink)">
         Filters
       </h3>
 
       <div className="grid grid-cols-1 gap-3 md:grid-cols-2 lg:grid-cols-3">
         {/* Source Type */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             Source Type
           </label>
           <Select
@@ -142,7 +142,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* Event Taxonomy */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             Event Taxonomy
           </label>
           <Select
@@ -166,7 +166,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* Action */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             Action
           </label>
           <Input
@@ -178,7 +178,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* Hostname */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             Hostname
           </label>
           <Input
@@ -190,7 +190,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* IP Address */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             IP Address
           </label>
           <Input
@@ -202,7 +202,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* User */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             User
           </label>
           <Input
@@ -214,7 +214,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* Date From */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             Date From
           </label>
           <Input
@@ -226,7 +226,7 @@ export function LogFilters({ onFilterChange, initialValues }: LogFiltersProps) {
 
         {/* Date To */}
         <div className="space-y-1">
-          <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+          <label className="text-xs font-medium text-(--sea-ink-soft)">
             Date To
           </label>
           <Input

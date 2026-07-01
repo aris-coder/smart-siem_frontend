@@ -76,15 +76,15 @@ function LogsPage() {
       {/* Page header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[var(--sea-ink)]">
+          <h1 className="text-lg font-semibold text-(--sea-ink)">
             Log Explorer
           </h1>
-          <p className="text-xs text-[var(--sea-ink-soft)]">
+          <p className="text-xs text-(--sea-ink-soft)">
             Search and investigate security events
           </p>
         </div>
         {data && (
-          <span className="text-xs text-[var(--sea-ink-soft)]">
+          <span className="text-xs text-(--sea-ink-soft)">
             {data.total.toLocaleString()} total results
           </span>
         )}

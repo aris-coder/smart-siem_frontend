@@ -64,7 +64,7 @@ export function TextField({
     <div>
       <Label
         htmlFor={label}
-        className="mb-2 text-sm font-semibold text-[var(--sea-ink)]"
+        className="mb-2 text-sm font-semibold text-(--sea-ink)"
       >
         {label}
       </Label>
@@ -94,7 +94,7 @@ export function TextArea({
     <div>
       <Label
         htmlFor={label}
-        className="mb-2 text-sm font-semibold text-[var(--sea-ink)]"
+        className="mb-2 text-sm font-semibold text-(--sea-ink)"
       >
         {label}
       </Label>
@@ -160,7 +160,7 @@ export function Slider({ label }: { label: string }) {
     <div>
       <Label
         htmlFor={label}
-        className="mb-2 text-sm font-semibold text-[var(--sea-ink)]"
+        className="mb-2 text-sm font-semibold text-(--sea-ink)"
       >
         {label}
       </Label>

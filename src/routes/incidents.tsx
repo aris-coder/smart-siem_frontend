@@ -148,10 +148,10 @@ function IncidentsPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[var(--sea-ink)]">
+          <h1 className="text-lg font-semibold text-(--sea-ink)">
             Incidents
           </h1>
-          <p className="text-xs text-[var(--sea-ink-soft)]">
+          <p className="text-xs text-(--sea-ink-soft)">
             Correlated security alerts and triage
           </p>
         </div>
@@ -173,7 +173,7 @@ function IncidentsPage() {
           {
             label: 'Open Incidents',
             value: stats?.open_incidents ?? '—',
-            tone: 'text-[var(--sea-ink)]',
+            tone: 'text-(--sea-ink)',
           },
           {
             label: 'System',
@@ -183,9 +183,9 @@ function IncidentsPage() {
         ].map((stat) => (
           <div
             key={stat.label}
-            className="rounded-xl border border-[var(--line)] bg-card p-4"
+            className="rounded-xl border border-(--line) bg-card p-4"
           >
-            <p className="text-xs text-[var(--sea-ink-soft)]">{stat.label}</p>
+            <p className="text-xs text-(--sea-ink-soft)">{stat.label}</p>
             <p className={`mt-1 text-2xl font-semibold ${stat.tone}`}>
               {stat.value}
             </p>
@@ -194,7 +194,7 @@ function IncidentsPage() {
       </div>
 
       {/* Tabs */}
-      <div className="flex gap-1 border-b border-[var(--line)]">
+      <div className="flex gap-1 border-b border-(--line)">
         {tabs.map((tab) => (
           <button
             key={tab.key}
@@ -202,8 +202,8 @@ function IncidentsPage() {
             onClick={() => setStatusTab(tab.key)}
             className={`px-4 py-2.5 text-xs font-medium transition-colors ${
               statusTab === tab.key
-                ? 'border-b-2 border-primary text-[var(--sea-ink)]'
-                : 'text-[var(--sea-ink-soft)] hover:text-[var(--sea-ink)]'
+                ? 'border-b-2 border-primary text-(--sea-ink)'
+                : 'text-(--sea-ink-soft) hover:text-(--sea-ink)'
             }`}
           >
             {tab.label}
@@ -227,16 +227,16 @@ function IncidentsPage() {
               key={incident.id}
               type="button"
               onClick={() => handleSelectIncident(incident)}
-              className="flex w-full items-start gap-3 rounded-xl border border-[var(--line)] bg-card p-4 text-left transition-colors hover:bg-[var(--link-bg-hover)]"
+              className="flex w-full items-start gap-3 rounded-xl border border-(--line) bg-card p-4 text-left transition-colors hover:bg-(--link-bg-hover)"
             >
               {severityIcons[incident.severity]}
               <div className="flex-1 min-w-0">
                 <div className="flex items-start justify-between gap-2">
                   <div className="min-w-0">
-                    <p className="truncate text-sm font-medium text-[var(--sea-ink)]">
+                    <p className="truncate text-sm font-medium text-(--sea-ink)">
                       {incident.summary}
                     </p>
-                    <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+                    <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
                       {incident.rule.name} ·{' '}
                       {new Date(incident.triggered_at).toLocaleString()}
                     </p>
@@ -254,7 +254,7 @@ function IncidentsPage() {
                     >
                       {incident.status}
                     </Badge>
-                    <ChevronRight className="size-4 text-[var(--sea-ink-soft)]" />
+                    <ChevronRight className="size-4 text-(--sea-ink-soft)" />
                   </div>
                 </div>
               </div>
@@ -279,10 +279,10 @@ function IncidentsPage() {
               <div className="flex items-start gap-3">
                 {severityIcons[selectedIncident.severity]}
                 <div className="min-w-0">
-                  <h2 className="text-lg font-semibold text-[var(--sea-ink)]">
+                  <h2 className="text-lg font-semibold text-(--sea-ink)">
                     {selectedIncident.summary}
                   </h2>
-                  <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+                  <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
                     {selectedIncident.rule.name} · ID:{' '}
                     {selectedIncident.id.slice(0, 8)}
                   </p>
@@ -316,10 +316,10 @@ function IncidentsPage() {
                   },
                 ].map((field) => (
                   <div key={field.label}>
-                    <dt className="text-xs font-medium text-[var(--sea-ink-soft)] uppercase tracking-wider">
+                    <dt className="text-xs font-medium text-(--sea-ink-soft) uppercase tracking-wider">
                       {field.label}
                     </dt>
-                    <dd className="mt-1 text-sm text-[var(--sea-ink)]">
+                    <dd className="mt-1 text-sm text-(--sea-ink)">
                       {field.label === 'Severity' ? (
                         <Badge
                           className={severityColors[selectedIncident.severity]}
@@ -346,7 +346,7 @@ function IncidentsPage() {
               {selectedIncident.related_entities.hosts &&
                 selectedIncident.related_entities.hosts.length > 0 && (
                   <div>
-                    <h3 className="mb-2 text-xs font-semibold text-[var(--sea-ink-soft)] uppercase tracking-wider">
+                    <h3 className="mb-2 text-xs font-semibold text-(--sea-ink-soft) uppercase tracking-wider">
                       Affected Hosts
                     </h3>
                     <div className="flex flex-wrap gap-2">

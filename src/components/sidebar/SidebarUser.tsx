@@ -33,17 +33,17 @@ export default function SidebarUser({ collapsed }: SidebarUserProps) {
   if (!user) return null
 
   return (
-    <div className="border-t border-[var(--line)] p-2">
+    <div className="border-t border-(--line) p-2">
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <button
             type="button"
             className={cn(
-              'flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-[var(--sea-ink)] transition-colors hover:bg-[var(--link-bg-hover)]',
+              'flex w-full cursor-pointer items-center gap-3 rounded-lg px-3 py-2 text-sm font-medium text-(--sea-ink) transition-colors hover:bg-(--link-bg-hover)',
               collapsed && 'justify-center px-0',
             )}
           >
-            <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-card text-xs font-bold uppercase text-[var(--sea-ink)]">
+            <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-(--line) bg-card text-xs font-bold uppercase text-(--sea-ink)">
               {user.username.charAt(0)}
             </div>
             {!collapsed && (
@@ -51,7 +51,7 @@ export default function SidebarUser({ collapsed }: SidebarUserProps) {
                 <span className="truncate text-sm font-medium">
                   {user.username}
                 </span>
-                <span className="truncate text-xs text-[var(--sea-ink-soft)]">
+                <span className="truncate text-xs text-(--sea-ink-soft)">
                   {user.role}
                 </span>
               </div>
@@ -66,7 +66,7 @@ export default function SidebarUser({ collapsed }: SidebarUserProps) {
         >
           <DropdownMenuLabel>
             <div className="flex items-center gap-3">
-              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-card text-sm font-bold uppercase">
+              <div className="flex size-9 shrink-0 items-center justify-center rounded-full border border-(--line) bg-card text-sm font-bold uppercase">
                 {user.username.charAt(0)}
               </div>
               <div className="flex min-w-0 flex-col">

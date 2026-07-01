@@ -239,10 +239,10 @@ function AdminUsersPage() {
     <div className="flex flex-col gap-6 p-4 lg:p-6">
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[var(--sea-ink)]">
+          <h1 className="text-lg font-semibold text-(--sea-ink)">
             User Management
           </h1>
-          <p className="text-xs text-[var(--sea-ink-soft)]">
+          <p className="text-xs text-(--sea-ink-soft)">
             Manage SOC users, roles, and access
           </p>
         </div>
@@ -270,16 +270,16 @@ function AdminUsersPage() {
       )}
 
       {/* Users table */}
-      <div className="overflow-hidden rounded-xl border border-[var(--line)] bg-white dark:bg-zinc-900">
+      <div className="overflow-hidden rounded-xl border border-(--line) bg-white dark:bg-zinc-900">
         <div className="overflow-x-auto">
           <table className="w-full">
             <thead>
-              <tr className="border-b border-[var(--line)]">
+              <tr className="border-b border-(--line)">
                 {['Name', 'Username', 'Role', 'Status', 'Created', ''].map(
                   (h) => (
                     <th
                       key={h}
-                      className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold text-[var(--sea-ink-soft)]"
+                      className="whitespace-nowrap px-4 py-3 text-left text-xs font-semibold text-(--sea-ink-soft)"
                     >
                       {h}
                     </th>
@@ -287,7 +287,7 @@ function AdminUsersPage() {
                 )}
               </tr>
             </thead>
-            <tbody className="divide-y divide-[var(--line)]">
+            <tbody className="divide-y divide-(--line)">
               {isLoading ? (
                 <tr>
                   <td
@@ -310,19 +310,19 @@ function AdminUsersPage() {
                 users.map((user) => (
                   <tr
                     key={user.id}
-                    className="transition-colors hover:bg-[var(--link-bg-hover)]"
+                    className="transition-colors hover:bg-(--link-bg-hover)"
                   >
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
-                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-[var(--line)] bg-white text-xs font-bold uppercase dark:bg-zinc-800">
+                        <div className="flex size-8 shrink-0 items-center justify-center rounded-full border border-(--line) bg-white text-xs font-bold uppercase dark:bg-zinc-800">
                           {user.username.charAt(0)}
                         </div>
-                        <span className="whitespace-nowrap text-sm font-medium text-[var(--sea-ink)]">
+                        <span className="whitespace-nowrap text-sm font-medium text-(--sea-ink)">
                           {user.username}
                         </span>
                       </div>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-sm text-[var(--sea-ink)]">
+                    <td className="whitespace-nowrap px-4 py-3 text-sm text-(--sea-ink)">
                       {user.username}
                     </td>
                     <td className="whitespace-nowrap px-4 py-3">
@@ -348,7 +348,7 @@ function AdminUsersPage() {
                         {user.is_active !== false ? 'Active' : 'Inactive'}
                       </span>
                     </td>
-                    <td className="whitespace-nowrap px-4 py-3 text-sm text-[var(--sea-ink-soft)]">
+                    <td className="whitespace-nowrap px-4 py-3 text-sm text-(--sea-ink-soft)">
                       {user.created_at
                         ? new Date(user.created_at).toLocaleDateString()
                         : '—'}
@@ -383,11 +383,11 @@ function AdminUsersPage() {
       {/* RBAC + Audit + Quick Invite grid */}
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
         {/* RBAC */}
-        <div className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900">
-          <h3 className="mb-1 text-sm font-semibold text-[var(--sea-ink)]">
+        <div className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900">
+          <h3 className="mb-1 text-sm font-semibold text-(--sea-ink)">
             RBAC Policy
           </h3>
-          <p className="mb-4 text-xs text-[var(--sea-ink-soft)]">
+          <p className="mb-4 text-xs text-(--sea-ink-soft)">
             Role-based access control levels
           </p>
           <div className="flex flex-col gap-3">
@@ -401,12 +401,12 @@ function AdminUsersPage() {
             ].map(([role, scope]) => (
               <div
                 key={role}
-                className="rounded-lg border border-[var(--line)] bg-[var(--surface)] p-3"
+                className="rounded-lg border border-(--line) bg-(--surface) p-3"
               >
-                <strong className="text-sm text-[var(--sea-ink)]">
+                <strong className="text-sm text-(--sea-ink)">
                   {role}
                 </strong>
-                <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+                <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
                   {scope}
                 </p>
               </div>
@@ -415,27 +415,27 @@ function AdminUsersPage() {
         </div>
 
         {/* Audit trail */}
-        <div className="rounded-xl border border-[var(--line)] bg-white dark:bg-zinc-900 lg:col-span-2">
-          <div className="border-b border-[var(--line)] px-4 py-3">
-            <h3 className="text-sm font-semibold text-[var(--sea-ink)]">
+        <div className="rounded-xl border border-(--line) bg-white dark:bg-zinc-900 lg:col-span-2">
+          <div className="border-b border-(--line) px-4 py-3">
+            <h3 className="text-sm font-semibold text-(--sea-ink)">
               Recent Activity
             </h3>
           </div>
           <div className="overflow-x-auto">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-[var(--line)]">
+                <tr className="border-b border-(--line)">
                   {['Time', 'Actor', 'Action', 'Target'].map((h) => (
                     <th
                       key={h}
-                      className="whitespace-nowrap px-4 py-2.5 text-left text-xs font-semibold text-[var(--sea-ink-soft)]"
+                      className="whitespace-nowrap px-4 py-2.5 text-left text-xs font-semibold text-(--sea-ink-soft)"
                     >
                       {h}
                     </th>
                   ))}
                 </tr>
               </thead>
-              <tbody className="divide-y divide-[var(--line)]">
+              <tbody className="divide-y divide-(--line)">
                 {auditTrail.length === 0 ? (
                   <tr>
                     <td
@@ -447,7 +447,7 @@ function AdminUsersPage() {
                   </tr>
                 ) : (
                   auditTrail.map((entry, i) => (
-                    <tr key={i} className="text-sm text-[var(--sea-ink)]">
+                    <tr key={i} className="text-sm text-(--sea-ink)">
                       <td className="whitespace-nowrap px-4 py-2.5 font-mono text-xs">
                         {entry.time}
                       </td>
@@ -487,7 +487,7 @@ function AdminUsersPage() {
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Username
               </label>
               <Input
@@ -498,7 +498,7 @@ function AdminUsersPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Password
               </label>
               <Input
@@ -510,7 +510,7 @@ function AdminUsersPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Role
               </label>
               <Select
@@ -564,7 +564,7 @@ function AdminUsersPage() {
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Username
               </label>
               <Input
@@ -576,7 +576,7 @@ function AdminUsersPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Role
               </label>
               <Select
@@ -594,7 +594,7 @@ function AdminUsersPage() {
               </Select>
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 New password
               </label>
               <Input
@@ -606,12 +606,12 @@ function AdminUsersPage() {
                 autoComplete="new-password"
               />
             </div>
-            <label className="flex items-center gap-2 text-sm text-[var(--sea-ink)]">
+            <label className="flex items-center gap-2 text-sm text-(--sea-ink)">
               <input
                 type="checkbox"
                 checked={editActive}
                 onChange={(e) => setEditActive(e.target.checked)}
-                className="size-4 rounded border-[var(--line)]"
+                className="size-4 rounded border-(--line)"
               />
               Account active
             </label>

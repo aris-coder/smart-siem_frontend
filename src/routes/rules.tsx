@@ -195,10 +195,10 @@ function RulesPage() {
       {/* Header */}
       <div className="flex items-center justify-between">
         <div>
-          <h1 className="text-lg font-semibold text-[var(--sea-ink)]">
+          <h1 className="text-lg font-semibold text-(--sea-ink)">
             Correlation Rules
           </h1>
-          <p className="text-xs text-[var(--sea-ink-soft)]">
+          <p className="text-xs text-(--sea-ink-soft)">
             Define detection logic and automated responses
           </p>
         </div>
@@ -222,16 +222,16 @@ function RulesPage() {
           {rules.map((rule) => (
             <div
               key={rule.id}
-              className="rounded-xl border border-[var(--line)] bg-white p-4 dark:bg-zinc-900"
+              className="rounded-xl border border-(--line) bg-white p-4 dark:bg-zinc-900"
             >
               <div className="flex items-start justify-between gap-3">
                 <div className="flex items-start gap-3 min-w-0">
-                  <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-[var(--line)] bg-[var(--surface)]">
-                    <Shield className="size-4 text-[var(--sea-ink)]" />
+                  <div className="mt-0.5 flex size-9 shrink-0 items-center justify-center rounded-lg border border-(--line) bg-(--surface)">
+                    <Shield className="size-4 text-(--sea-ink)" />
                   </div>
                   <div className="min-w-0">
                     <div className="flex items-center gap-2">
-                      <span className="truncate text-sm font-medium text-[var(--sea-ink)]">
+                      <span className="truncate text-sm font-medium text-(--sea-ink)">
                         {rule.name}
                       </span>
                       <Badge
@@ -242,7 +242,7 @@ function RulesPage() {
                       </Badge>
                     </div>
                     {rule.tactic && (
-                      <p className="mt-0.5 text-xs text-[var(--sea-ink-soft)]">
+                      <p className="mt-0.5 text-xs text-(--sea-ink-soft)">
                         {rule.tactic}{rule.technique ? ` · ${rule.technique}` : ''}
                       </p>
                     )}
@@ -269,7 +269,7 @@ function RulesPage() {
                   <button
                     type="button"
                     onClick={() => openEdit(rule)}
-                    className="rounded-md p-1.5 text-[var(--sea-ink-soft)] transition-colors hover:bg-[var(--link-bg-hover)] hover:text-[var(--sea-ink)]"
+                    className="rounded-md p-1.5 text-(--sea-ink-soft) transition-colors hover:bg-(--link-bg-hover) hover:text-(--sea-ink)"
                     title="Edit"
                   >
                     <Pencil className="size-3.5" />
@@ -277,7 +277,7 @@ function RulesPage() {
                   <button
                     type="button"
                     onClick={() => setDeleteTarget(rule)}
-                    className="rounded-md p-1.5 text-[var(--sea-ink-soft)] transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
+                    className="rounded-md p-1.5 text-(--sea-ink-soft) transition-colors hover:bg-red-50 hover:text-red-600 dark:hover:bg-red-900/20"
                     title="Delete"
                   >
                     <Trash2 className="size-3.5" />
@@ -288,13 +288,13 @@ function RulesPage() {
               {/* Rule details */}
               <div className="mt-3 grid grid-cols-2 gap-x-4 gap-y-2 text-xs">
                 <div>
-                  <span className="text-[var(--sea-ink-soft)]">Confidence</span>
-                  <span className="ml-2 font-medium text-[var(--sea-ink)]">
+                  <span className="text-(--sea-ink-soft)">Confidence</span>
+                  <span className="ml-2 font-medium text-(--sea-ink)">
                     {rule.confidence_weight}%
                   </span>
                 </div>
                 <div>
-                  <span className="text-[var(--sea-ink-soft)]">Status</span>
+                  <span className="text-(--sea-ink-soft)">Status</span>
                   <span
                     className={`ml-2 font-medium ${
                       rule.is_active
@@ -307,16 +307,16 @@ function RulesPage() {
                 </div>
                 {rule.definition.threshold !== undefined && (
                   <div>
-                    <span className="text-[var(--sea-ink-soft)]">Threshold</span>
-                    <span className="ml-2 font-medium text-[var(--sea-ink)]">
+                    <span className="text-(--sea-ink-soft)">Threshold</span>
+                    <span className="ml-2 font-medium text-(--sea-ink)">
                       {rule.definition.threshold}
                     </span>
                   </div>
                 )}
                 {rule.definition.time_window_seconds && (
                   <div>
-                    <span className="text-[var(--sea-ink-soft)]">Window</span>
-                    <span className="ml-2 font-medium text-[var(--sea-ink)]">
+                    <span className="text-(--sea-ink-soft)">Window</span>
+                    <span className="ml-2 font-medium text-(--sea-ink)">
                       {rule.definition.time_window_seconds}s
                     </span>
                   </div>
@@ -337,11 +337,11 @@ function RulesPage() {
 
               {/* Playbook badge */}
               {rule.definition.trigger_playbook && (
-                <div className="mt-2 flex items-center gap-1.5 text-xs text-[var(--sea-ink-soft)]">
+                <div className="mt-2 flex items-center gap-1.5 text-xs text-(--sea-ink-soft)">
                   <AlertTriangle className="size-3" />
                   <span>
                     Triggers:{' '}
-                    <span className="font-medium text-[var(--sea-ink)]">
+                    <span className="font-medium text-(--sea-ink)">
                       {rule.definition.trigger_playbook}
                     </span>
                     {rule.definition.playbook_mode
@@ -367,7 +367,7 @@ function RulesPage() {
 
           <div className="grid grid-cols-2 gap-x-4 gap-y-3">
             <div className="col-span-2 flex flex-col gap-1.5 sm:col-span-1">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Rule ID *
               </label>
               <Input
@@ -377,7 +377,7 @@ function RulesPage() {
               />
             </div>
             <div className="col-span-2 flex flex-col gap-1.5 sm:col-span-1">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Name *
               </label>
               <Input
@@ -387,7 +387,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Tactic (MITRE)
               </label>
               <Input
@@ -397,7 +397,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Technique (MITRE)
               </label>
               <Input
@@ -407,7 +407,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Threshold
               </label>
               <Input
@@ -418,7 +418,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Time Window (seconds)
               </label>
               <Input
@@ -429,7 +429,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Interval (seconds)
               </label>
               <Input
@@ -440,7 +440,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Confidence Weight
               </label>
               <Input
@@ -452,7 +452,7 @@ function RulesPage() {
               />
             </div>
             <div className="col-span-2 flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Source Types (comma separated)
               </label>
               <Input
@@ -462,7 +462,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Trigger Playbook
               </label>
               <Input
@@ -472,7 +472,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Playbook Mode
               </label>
               <div className="flex gap-2">
@@ -481,8 +481,8 @@ function RulesPage() {
                   onClick={() => setNewPlaybookMode('AUTO')}
                   className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                     newPlaybookMode === 'AUTO'
-                      ? 'border-[var(--sea-ink)] bg-[var(--sea-ink)] text-white'
-                      : 'border-[var(--line)] text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)]'
+                      ? 'border-(--sea-ink) bg-(--sea-ink) text-white'
+                      : 'border-(--line) text-(--sea-ink) hover:bg-(--link-bg-hover)'
                   }`}
                 >
                   AUTO
@@ -492,8 +492,8 @@ function RulesPage() {
                   onClick={() => setNewPlaybookMode('CONFIRM')}
                   className={`flex-1 rounded-lg border px-3 py-2 text-xs font-medium transition-colors ${
                     newPlaybookMode === 'CONFIRM'
-                      ? 'border-[var(--sea-ink)] bg-[var(--sea-ink)] text-white'
-                      : 'border-[var(--line)] text-[var(--sea-ink)] hover:bg-[var(--link-bg-hover)]'
+                      ? 'border-(--sea-ink) bg-(--sea-ink) text-white'
+                      : 'border-(--line) text-(--sea-ink) hover:bg-(--link-bg-hover)'
                   }`}
                 >
                   CONFIRM
@@ -537,7 +537,7 @@ function RulesPage() {
 
           <div className="flex flex-col gap-4">
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Name
               </label>
               <Input
@@ -546,7 +546,7 @@ function RulesPage() {
               />
             </div>
             <div className="flex flex-col gap-1.5">
-              <label className="text-xs font-medium text-[var(--sea-ink-soft)]">
+              <label className="text-xs font-medium text-(--sea-ink-soft)">
                 Confidence Weight
               </label>
               <Input
@@ -557,12 +557,12 @@ function RulesPage() {
                 max={100}
               />
             </div>
-            <label className="flex items-center gap-2 text-sm text-[var(--sea-ink)]">
+            <label className="flex items-center gap-2 text-sm text-(--sea-ink)">
               <input
                 type="checkbox"
                 checked={editActive}
                 onChange={(e) => setEditActive(e.target.checked)}
-                className="size-4 rounded border-[var(--line)]"
+                className="size-4 rounded border-(--line)"
               />
               Rule active
             </label>
