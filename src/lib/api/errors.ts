@@ -15,3 +15,11 @@ export function getApiErrorMessage(
 
   return fallback
 }
+
+export function isUnauthorizedError(error: unknown): boolean {
+  if (error && typeof error === 'object' && 'response' in error) {
+    const axiosErr = error as { response?: { status?: number } }
+    return axiosErr.response?.status === 401
+  }
+  return false
+}

@@ -1,13 +1,5 @@
-import React, { useState, useMemo } from 'react'
-import {
-  ShieldAlert,
-  AlertTriangle,
-  Info,
-  Shield,
-  Users,
-  Server,
-  Globe,
-} from 'lucide-react'
+import { useState, useMemo } from 'react'
+import { ShieldAlert, Shield, Users, Server, Globe } from 'lucide-react'
 
 // --- Types ---
 export interface ChartDataPoint {
@@ -107,7 +99,7 @@ export function SeverityDonutChart({
         <Shield className="size-4 text-(--sea-ink-soft)" />
       </div>
 
-      <div className="flex flex-1 flex-col sm:flex-row items-center justify-center gap-6 min-h-[180px]">
+      <div className="flex flex-1 flex-col sm:flex-row items-center justify-center gap-6 min-h-45">
         {/* SVG Circle */}
         <div className="relative size-36 shrink-0">
           <svg className="size-full -rotate-90" viewBox="0 0 140 140">
@@ -198,42 +190,30 @@ export function SeverityDonutChart({
 }
 
 // --- 2. EVENT EVOLUTION CHART ---
-export function EventEvolutionChart() {
+interface EventTimelinePoint {
+  bucket_start: string
+  bucket_end: string
+  label: string
+  count: number
+}
+
+interface EventEvolutionChartProps {
+  data?: EventTimelinePoint[]
+}
+
+export function EventEvolutionChart({ data }: EventEvolutionChartProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
-  // Real-time fluctuation simulation dataset (24h timeline)
-  const dataset = useMemo(
-    () => [
-      { time: '08:00', count: 180 },
-      { time: '09:00', count: 320 },
-      { time: '10:00', count: 450 },
-      { time: '11:00', count: 390 },
-      { time: '12:00', count: 280 },
-      { time: '13:00', count: 310 },
-      { time: '14:00', count: 520 },
-      { time: '15:00', count: 680 },
-      { time: '16:00', count: 710 },
-      { time: '17:00', count: 490 },
-      { time: '18:00', count: 340 },
-      { time: '19:00', count: 290 },
-      { time: '20:00', count: 210 },
-      { time: '21:00', count: 190 },
-      { time: '22:00', count: 250 },
-      { time: '23:00', count: 540 },
-      { time: '00:00', count: 610 },
-      { time: '01:00', count: 820 }, // SSH attack simulation
-      { time: '02:00', count: 850 },
-      { time: '03:00', count: 480 },
-      { time: '04:00', count: 230 },
-      { time: '05:00', count: 150 },
-      { time: '06:00', count: 140 },
-      { time: '07:00', count: 160 },
-    ],
-    [],
-  )
+  const dataset = useMemo(() => {
+    if (data && data.length > 0) {
+      return data.map((d) => ({ time: d.label, count: d.count }))
+    }
+    // Fallback empty
+    return []
+  }, [data])
 
   const maxVal = useMemo(
-    () => Math.max(...dataset.map((d) => d.count)),
+    () => Math.max(...dataset.map((d) => d.count), 1),
     [dataset],
   )
   const yTicks = useMemo(() => {
@@ -422,30 +402,19 @@ export function EventEvolutionChart() {
 }
 
 // --- 3. TOP SOURCES CHART ---
-interface TopSourcesChartProps {
-  ips?: string[]
+interface TopSourceItem {
+  source_ip: string
+  count: number
+  percentage: number
 }
 
-export function TopSourcesChart({ ips = [] }: TopSourcesChartProps) {
-  // Merge loaded statistics IP or fallback to realistic SOC list
-  const data = useMemo(() => {
-    const list =
-      ips && ips.length > 0
-        ? ips
-        : [
-            '192.168.4.120',
-            '10.20.101.45',
-            '172.16.88.2',
-            '185.190.140.23',
-            '192.168.1.1',
-          ]
-    const eventsCount = [1420, 890, 750, 480, 210]
-    return list.slice(0, 5).map((ip, i) => ({
-      ip,
-      count: eventsCount[i] || 100 - i * 20,
-      percentage: (eventsCount[i] / 1420) * 100,
-    }))
-  }, [ips])
+interface TopSourcesChartProps {
+  data?: TopSourceItem[]
+}
+
+export function TopSourcesChart({ data = [] }: TopSourcesChartProps) {
+  // Fallback to empty if no data
+  const items = data.length > 0 ? data.slice(0, 5) : []
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-zinc-900 border border-(--line) rounded-xl p-5 shadow-sm">
@@ -462,11 +431,11 @@ export function TopSourcesChart({ ips = [] }: TopSourcesChartProps) {
       </div>
 
       <div className="flex flex-col gap-4 justify-center flex-1">
-        {data.map((item, idx) => (
-          <div key={item.ip} className="space-y-1.5">
+        {items.map((item) => (
+          <div key={item.source_ip} className="space-y-1.5">
             <div className="flex justify-between items-center text-xs font-mono">
               <span className="font-medium text-(--sea-ink) hover:text-blue-500 transition-colors cursor-pointer">
-                {item.ip}
+                {item.source_ip}
               </span>
               <span className="font-bold text-(--sea-ink)">
                 {item.count} evts
@@ -492,19 +461,62 @@ export function TopSourcesChart({ ips = [] }: TopSourcesChartProps) {
 }
 
 // --- 4. THREAT TYPES CHART ---
-export function ThreatTypesChart() {
+interface ThreatTypeItem {
+  type: string
+  key: string
+  count: number
+  percentage: number
+}
+
+interface ThreatTypesChartProps {
+  data?: ThreatTypeItem[]
+}
+
+export function ThreatTypesChart({ data }: ThreatTypesChartProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
-  const threats = useMemo(
-    () => [
-      { type: 'SSH Bruteforce', value: 38, count: 1420, color: '#f87171' },
-      { type: 'DDoS Traffic', value: 24, count: 890, color: '#fb923c' },
-      { type: 'Port Scan', value: 18, count: 680, color: '#fbbf24' },
-      { type: 'Malware Dropper', value: 12, count: 450, color: '#818cf8' },
-      { type: 'Data Exfil', value: 8, count: 290, color: '#34d399' },
-    ],
-    [],
-  )
+  const threats = useMemo(() => {
+    if (data && data.length > 0) {
+      const colors = [
+        '#f87171',
+        '#fb923c',
+        '#fbbf24',
+        '#818cf8',
+        '#34d399',
+        '#a78bfa',
+        '#f472b6',
+        '#22d3ee',
+      ]
+      return data.slice(0, 8).map((t, i) => ({
+        type: t.type,
+        value: t.percentage,
+        count: t.count,
+        color: colors[i % colors.length],
+      }))
+    }
+    return []
+  }, [data])
+
+  if (threats.length === 0) {
+    return (
+      <div className="flex flex-col h-full bg-white dark:bg-zinc-900 border border-(--line) rounded-xl p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-semibold text-(--sea-ink)">
+              Types de Menaces
+            </h3>
+            <p className="text-[10px] text-(--sea-ink-soft)">
+              Distribution des typologies d'attaques
+            </p>
+          </div>
+          <ShieldAlert className="size-4 text-(--sea-ink-soft)" />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-xs text-muted-foreground">Aucune donnée</p>
+        </div>
+      </div>
+    )
+  }
 
   return (
     <div className="flex flex-col h-full bg-white dark:bg-zinc-900 border border-(--line) rounded-xl p-5 shadow-sm">
@@ -520,7 +532,7 @@ export function ThreatTypesChart() {
         <ShieldAlert className="size-4 text-(--sea-ink-soft)" />
       </div>
 
-      <div className="flex items-end justify-between gap-3 h-[180px] pt-4 px-2 select-none relative">
+      <div className="flex items-end justify-between gap-3 h-45 pt-4 px-2 select-none relative">
         {threats.map((t, idx) => (
           <div
             key={t.type}
@@ -529,7 +541,7 @@ export function ThreatTypesChart() {
             onMouseLeave={() => setHoveredIdx(null)}
           >
             {/* Bar */}
-            <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-t-lg h-[130px] flex items-end overflow-hidden relative">
+            <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-t-lg h-32.5 flex items-end overflow-hidden relative">
               <div
                 className="w-full rounded-t-lg transition-all duration-700 ease-out"
                 style={{
@@ -568,26 +580,51 @@ export function ThreatTypesChart() {
 }
 
 // --- 5. LOGIN FAILURES CHART ---
-export function LoginFailuresChart() {
+interface LoginFailureItem {
+  label: string
+  count: number
+  threat_level: string
+  description: string
+}
+
+interface LoginFailuresChartProps {
+  data?: LoginFailureItem[]
+}
+
+export function LoginFailuresChart({ data }: LoginFailuresChartProps) {
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null)
 
-  const timeline = useMemo(
-    () => [
-      { time: '02h-04h', count: 12, threat: 'Faible' },
-      { time: '04h-06h', count: 8, threat: 'Faible' },
-      { time: '06h-08h', count: 14, threat: 'Faible' },
-      { time: '08h-10h', count: 48, threat: 'Moyen' },
-      { time: '10h-12h', count: 89, threat: 'Moyen (Bruteforce suspicion)' },
-      {
-        time: '12h-14h',
-        count: 154,
-        threat: 'Élevé (Attaque force brute IP externe)',
-      },
-      { time: '14h-16h', count: 62, threat: 'Moyen' },
-      { time: '16h-18h', count: 28, threat: 'Faible' },
-    ],
-    [],
-  )
+  const timeline = useMemo(() => {
+    if (data && data.length > 0) {
+      return data.map((d) => ({
+        time: d.label,
+        count: d.count,
+        threat: d.threat_level + (d.description ? ` (${d.description})` : ''),
+      }))
+    }
+    return []
+  }, [data])
+
+  if (timeline.length === 0) {
+    return (
+      <div className="flex flex-col h-full bg-white dark:bg-zinc-900 border border-(--line) rounded-xl p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-4">
+          <div>
+            <h3 className="text-sm font-semibold text-(--sea-ink)">
+              Échecs de Connexion
+            </h3>
+            <p className="text-[10px] text-(--sea-ink-soft)">
+              Tendance des connexions rejetées
+            </p>
+          </div>
+          <Users className="size-4 text-(--sea-ink-soft)" />
+        </div>
+        <div className="flex-1 flex items-center justify-center">
+          <p className="text-xs text-muted-foreground">Aucune donnée</p>
+        </div>
+      </div>
+    )
+  }
 
   const maxFailures = useMemo(
     () => Math.max(...timeline.map((t) => t.count)),
@@ -599,7 +636,7 @@ export function LoginFailuresChart() {
       <div className="flex items-center justify-between mb-4">
         <div>
           <h3 className="text-sm font-semibold text-(--sea-ink)">
-            Échecs de Connexion (16h)
+            Échecs de Connexion
           </h3>
           <p className="text-[10px] text-(--sea-ink-soft)">
             Tendance des connexions rejetées
@@ -608,7 +645,7 @@ export function LoginFailuresChart() {
         <Users className="size-4 text-(--sea-ink-soft)" />
       </div>
 
-      <div className="flex items-end justify-between gap-2.5 h-[130px] select-none relative pt-4">
+      <div className="flex items-end justify-between gap-2.5 h-32.5 select-none relative pt-4">
         {timeline.map((item, idx) => {
           const percent = (item.count / maxFailures) * 100
           return (
@@ -619,7 +656,7 @@ export function LoginFailuresChart() {
               onMouseLeave={() => setHoveredIdx(null)}
             >
               {/* Bar */}
-              <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-t h-[90px] flex items-end relative overflow-hidden">
+              <div className="w-full bg-zinc-100 dark:bg-zinc-800 rounded-t h-22.5 flex items-end relative overflow-hidden">
                 <div
                   className={`w-full rounded-t transition-all duration-500 ${
                     item.count > 100
@@ -645,7 +682,7 @@ export function LoginFailuresChart() {
 
         {/* Tooltip */}
         {hoveredIdx !== null && timeline[hoveredIdx] && (
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-md text-xs w-[180px]">
+          <div className="absolute top-2 left-1/2 -translate-x-1/2 z-10 p-2.5 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-md text-xs w-45">
             <p className="font-semibold text-(--sea-ink)">
               Période : {timeline[hoveredIdx].time}
             </p>
@@ -663,7 +700,21 @@ export function LoginFailuresChart() {
 }
 
 // --- 6. SUSPICIOUS ACTIVITY HEATMAP ---
-export function SuspiciousActivityHeatmap() {
+interface HeatmapCellData {
+  day: string
+  hour_block: string
+  score: number
+  level: string
+  description: string
+}
+
+interface SuspiciousActivityHeatmapProps {
+  data?: HeatmapCellData[]
+}
+
+export function SuspiciousActivityHeatmap({
+  data,
+}: SuspiciousActivityHeatmapProps) {
   const [hoveredCell, setHoveredCell] = useState<{
     day: string
     hour: string
@@ -681,26 +732,37 @@ export function SuspiciousActivityHeatmap() {
     '20h-00h',
   ]
 
-  // Suspicious baseline activity levels (0-3 scale: low, medium, high, critical)
-  const gridData = useMemo(
-    () => [
-      // Lun
-      [1, 0, 1, 1, 0, 1],
-      // Mar
-      [0, 0, 1, 2, 1, 0],
-      // Mer
-      [0, 1, 1, 1, 0, 0],
-      // Jeu
-      [1, 0, 1, 0, 1, 2],
-      // Ven
-      [0, 0, 1, 1, 1, 3], // Friday night port scan simulation
-      // Sam
-      [1, 3, 0, 0, 0, 1], // Saturday morning abnormal API traffic
-      // Dim
-      [2, 0, 0, 1, 0, 0],
-    ],
-    [],
-  )
+  // Build grid from API data or default to empty
+  const gridData = useMemo(() => {
+    if (data && data.length > 0) {
+      const dayMap: Record<string, number> = {
+        MON: 0,
+        TUE: 1,
+        WED: 2,
+        THU: 3,
+        FRI: 4,
+        SAT: 5,
+        SUN: 6,
+      }
+      const hourMap: Record<string, number> = {
+        '00h-04h': 0,
+        '04h-08h': 1,
+        '08h-12h': 2,
+        '12h-16h': 3,
+        '16h-20h': 4,
+        '20h-00h': 5,
+      }
+      const grid = Array.from({ length: 7 }, () => Array(6).fill(0))
+      for (const cell of data) {
+        grid[dayMap[cell.day]][hourMap[cell.hour_block]] = Math.min(
+          cell.score,
+          3,
+        )
+      }
+      return grid
+    }
+    return Array.from({ length: 7 }, () => Array(6).fill(0))
+  }, [data])
 
   const cellDetails = (dayIdx: number, hourIdx: number) => {
     const val = gridData[dayIdx][hourIdx]
@@ -806,7 +868,7 @@ export function SuspiciousActivityHeatmap() {
 
       {/* Pop-up Cell Details */}
       {hoveredCell && (
-        <div className="absolute z-20 top-2 left-1/2 -translate-x-1/2 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-md text-xs w-[220px]">
+        <div className="absolute z-20 top-2 left-1/2 -translate-x-1/2 p-2 rounded-lg border border-zinc-200 dark:border-zinc-800 bg-white dark:bg-zinc-950 shadow-md text-xs w-55">
           <div className="flex justify-between items-center font-bold text-(--sea-ink) mb-0.5">
             <span>
               {hoveredCell.day} - {hoveredCell.hour}
